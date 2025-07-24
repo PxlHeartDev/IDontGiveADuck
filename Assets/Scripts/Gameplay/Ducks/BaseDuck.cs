@@ -1,0 +1,202 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+/// <summary>
+/// Abstract base class for all duck types
+/// Provides common functionality and enforces consistent interface
+/// Save this as: Assets/Scripts/Gameplay/Ducks/BaseDuck.cs
+/// </summary>
+public abstract class BaseDuck : MonoBehaviour
+{
+    [Header("Base Duck Properties")]
+    [SerializeField] protected int pointValue = 1;
+    [SerializeField] protected float lifetime = 5f;
+    [SerializeField] protected float moveSpeed = 0f; // For future moving ducks
+    
+    [Header("Visual Feedback")]
+    [SerializeField] protected ParticleSystem destroyEffect;
+    [SerializeField] protected AudioClip clickSound;
+    
+    // Protected properties accessible to child classes
+    protected float currentLifetime;
+    protected bool isClicked = false;
+    protected bool isInitialized = false;
+    
+    // Public properties for external access
+    public int PointValue => pointValue;
+    public bool IsClicked => isClicked;
+    
+    #region Unity Lifecycle
+    
+    protected virtual void Start()
+    {
+        Initialize();
+    }
+    
+    protected virtual void Update()
+    {
+        if (!isInitialized) return;
+        
+        HandleLifetime();
+        HandleMovement();
+        HandleClickDetection();
+    }
+    
+    /// <summary>
+    /// Handle mouse click detection using new Input System
+    /// </summary>
+    private void HandleClickDetection()
+    {
+        if (isClicked) return;
+        
+        // Check if mouse button was pressed this frame
+        if (Mouse.current?.leftButton.wasPressedThisFrame == true)
+        {
+            // Cast ray from mouse position to check if we hit this duck
+            Vector2 mousePos = Mouse.current.position.ReadValue();
+            Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
+            
+            Collider2D hitCollider = Physics2D.OverlapPoint(worldPos);
+            if (hitCollider != null && hitCollider.gameObject == gameObject)
+            {
+                isClicked = true;
+                OnClicked();
+            }
+        }
+    }
+    
+    // Keep OnMouseDown as backup for older Unity versions
+    protected virtual void OnMouseDown()
+    {
+        if (!isClicked && isInitialized)
+        {
+            isClicked = true;
+            OnClicked();
+        }
+    }
+    
+    #endregion
+    
+    #region Initialization
+    
+    /// <summary>
+    /// Initialize duck with custom properties
+    /// </summary>
+    public virtual void Initialize(float customLifetime = -1, int customPointValue = -1)
+    {
+        currentLifetime = customLifetime > 0 ? customLifetime : lifetime;
+        if (customPointValue > 0) pointValue = customPointValue;
+        
+        isInitialized = true;
+        OnDuckSpawned();
+    }
+    
+    #endregion
+    
+    #region Core Behaviors
+    
+    /// <summary>
+    /// Handle duck lifetime countdown
+    /// </summary>
+    protected virtual void HandleLifetime()
+    {
+        currentLifetime -= Time.deltaTime;
+        
+        // Visual feedback as lifetime gets low
+        if (currentLifetime <= 1f)
+        {
+            OnLifetimeLow();
+        }
+        
+        if (currentLifetime <= 0 && !isClicked)
+        {
+            OnLifetimeExpired();
+            DestroyDuck();
+        }
+    }
+    
+    /// <summary>
+    /// Handle duck movement (override in child classes)
+    /// </summary>
+    protected virtual void HandleMovement()
+    {
+        // Base implementation - no movement
+        // Override in child classes for moving ducks
+    }
+    
+    /// <summary>
+    /// Common destruction logic with effects
+    /// </summary>
+    protected virtual void DestroyDuck()
+    {
+        // Play destruction effects
+        if (destroyEffect != null)
+        {
+            // Create effect at duck position
+            ParticleSystem effect = Instantiate(destroyEffect, transform.position, transform.rotation);
+            Destroy(effect.gameObject, effect.main.duration);
+        }
+        
+        // Play sound effect
+        if (clickSound != null)
+        {
+            AudioSource.PlayClipAtPoint(clickSound, transform.position);
+        }
+        
+        // Remove duck from scene
+        Destroy(gameObject);
+    }
+    
+    #endregion
+    
+    #region Abstract Methods - Must be implemented by child classes
+    
+    /// <summary>
+    /// Handle duck click behavior - specific to each duck type
+    /// </summary>
+    protected abstract void OnClicked();
+    
+    /// <summary>
+    /// Handle what happens when duck lifetime expires naturally
+    /// </summary>
+    protected abstract void OnLifetimeExpired();
+    
+    #endregion
+    
+    #region Virtual Methods - Can be overridden by child classes
+    
+    /// <summary>
+    /// Called when duck is first spawned
+    /// </summary>
+    protected virtual void OnDuckSpawned()
+    {
+        // Default implementation - can be overridden
+        Debug.Log($"{GetType().Name} spawned with {currentLifetime}s lifetime");
+    }
+    
+    /// <summary>
+    /// Called when duck lifetime is getting low (< 1 second)
+    /// </summary>
+    protected virtual void OnLifetimeLow()
+    {
+        // Default implementation - visual warning
+        // Override for custom low-lifetime effects
+    }
+    
+    #endregion
+    
+    #region Debug Helpers
+    
+    protected virtual void OnDrawGizmos()
+    {
+        // Draw lifetime indicator in scene view
+        if (Application.isPlaying && isInitialized)
+        {
+            float lifetimePercent = currentLifetime / lifetime;
+            Gizmos.color = Color.Lerp(Color.red, Color.green, lifetimePercent);
+            Gizmos.DrawWireSphere(transform.position + Vector3.up, 0.5f);
+        }
+    }
+    
+    #endregion
+}

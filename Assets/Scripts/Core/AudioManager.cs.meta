@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: 2d707aaf11b0b6a47bb0ed35432bb5c1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - musicSource: {instanceID: 0}
+  - sfxSource: {instanceID: 0}
+  - uiSource: {instanceID: 0}
+  - menuMusic: {instanceID: 0}
+  - gameplayMusic: {fileID: 8300000, guid: e2e4aee7bc86054428f1e8f8fc496a6a, type: 3}
+  - gameOverMusic: {instanceID: 0}
+  - victoryMusic: {instanceID: 0}
+  - buttonClickSound: {instanceID: 0}
+  - buttonHoverSound: {instanceID: 0}
+  - levelStartSound: {instanceID: 0}
+  - levelCompleteSound: {instanceID: 0}
+  - gameOverSound: {instanceID: 0}
+  - duckClickGoodSound: {fileID: 8300000, guid: 92648bc8bb61f2142ad3ae9708c86a30, type: 3}
+  - duckClickDecoySound: {fileID: 8300000, guid: e1acdd1bc4d1e8f4a871efbe1ea6e9ab, type: 3}
+  - duckSpawnSound: {instanceID: 0}
+  - duckExpireSound: {instanceID: 0}
+  - timeWarningSound: {instanceID: 0}
+  - powerUpSound: {instanceID: 0}
+  - streakBonusSound: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

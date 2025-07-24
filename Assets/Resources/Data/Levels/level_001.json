@@ -1,0 +1,19 @@
+
+{
+  "levelId": 1,
+  "levelName": "First Steps",
+  "goodDucks": 3,
+  "decoyDucks": 2,
+  "timeLimit": 30,
+  "spawnRate": 3.0,
+  "duckLifetime": 5.0,
+  "decoyPenalty": 2,
+  "sizeDistribution": {
+    "large": 0.6,
+    "medium": 0.35,
+    "small": 0.05
+  },
+  "specialMechanics": [],
+  "backgroundMusic": "tutorial_theme",
+  "difficulty": "tutorial"
+}
