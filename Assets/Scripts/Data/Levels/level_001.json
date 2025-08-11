@@ -1,0 +1,23 @@
+// level_001.json 
+{
+  "levelId": 1,
+  "levelName": "First Steps",
+  "goodDucks": 3,
+  "decoyDucks": 0,
+  "timeLimit": 30,
+  "spawnRate": 3.0,
+  "duckLifetime": 5.0,
+  "decoyPenalty": 0,
+  "sizeDistribution": {
+    "large": 0.8,
+    "medium": 0.2,
+    "small": 0.0
+  },
+  "specialMechanics": [],
+  "backgroundMusic": "tutorial_theme",
+  "difficulty": "tutorial",
+  "designNotes": "Pure tutorial - build confidence, no pressure",
+  "targetSuccessRate": 0.95,
+  "learningObjective": "Teach basic clicking mechanics without any pressure"
+}
+

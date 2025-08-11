@@ -1,0 +1,19 @@
+// level_003.json
+{
+  "levelId": 3,
+  "levelName": "Basic Challenge",
+  "goodDucks": 4,
+  "decoyDucks": 0,
+  "timeLimit": 30,
+  "spawnRate": 2.8,
+  "duckLifetime": 4.8,
+  "decoyPenalty": 2,
+  "sizeDistribution": {
+    "large": 0.6,
+    "medium": 0.35,
+    "small": 0.05
+  },
+  "specialMechanics": [],
+  "backgroundMusic": "tutorial_theme",
+  "difficulty": "tutorial"
+}

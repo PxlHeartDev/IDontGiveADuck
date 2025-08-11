@@ -1,0 +1,22 @@
+// level_007.json
+{
+  "levelId": 7,
+  "levelName": "The Jump",
+  "goodDucks": 13,
+  "decoyDucks": 5,
+  "timeLimit": 30,
+  "spawnRate": 1.4,
+  "duckLifetime": 2.8,
+  "decoyPenalty": 3,
+  "sizeDistribution": {
+    "large": 0.40,
+    "medium": 0.45,
+    "small": 0.15
+  },
+  "specialMechanics": [],
+  "backgroundMusic": "challenge_theme",
+  "difficulty": "medium",
+  "designNotes": "Significant difficulty jump - test player adaptation",
+  "targetSuccessRate": 0.55,
+  "learningObjective": "Create noticeable difficulty spike that challenges but doesn't break players"
+}

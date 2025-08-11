@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Handles spawning of ducks based on level configuration
-/// Save this as: Assets/Scripts/Gameplay/DuckSpawner.cs
 /// </summary>
 public class DuckSpawner : MonoBehaviour
 {

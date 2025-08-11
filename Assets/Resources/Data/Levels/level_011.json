@@ -1,0 +1,22 @@
+// level_011.json
+{
+  "levelId": 11,
+  "levelName": "Maximum Pressure",
+  "goodDucks": 21,
+  "decoyDucks": 9,
+  "timeLimit": 30,
+  "spawnRate": 1.0,
+  "duckLifetime": 2.0,
+  "decoyPenalty": 5,
+  "sizeDistribution": {
+    "large": 0.20,
+    "medium": 0.50,
+    "small": 0.30
+  },
+  "specialMechanics": ["fast_movement", "overlapping_spawns"],
+  "backgroundMusic": "expert_theme",
+  "difficulty": "expert",
+  "designNotes": "Near-maximum difficulty - ultimate skill test",
+  "targetSuccessRate": 0.30,
+  "learningObjective": "Push players to their mechanical and decision-making limits"
+}

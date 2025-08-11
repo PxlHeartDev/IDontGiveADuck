@@ -4,8 +4,7 @@ using System.IO;
 
 /// <summary>
 /// Handles loading and caching level data from JSON files
-/// Save this as: Assets/Scripts/Data/LevelLoader.cs
-/// </summary>
+/// /// </summary>
 public class LevelLoader : MonoBehaviour
 {
     public static LevelLoader Instance { get; private set; }
@@ -60,6 +59,10 @@ public class LevelLoader : MonoBehaviour
             // Cache the loaded level
             loadedLevels[levelId] = levelData;
             Debug.Log($"Successfully loaded Level {levelId}: {levelData.levelName}");
+            
+            // Debug: Log the new fields to verify JSON loading
+            levelData.LogLevelData();
+            
             return levelData;
         }
         catch (System.Exception e)
@@ -101,7 +104,11 @@ public class LevelLoader : MonoBehaviour
             spawnRate = 3.0f,
             duckLifetime = 5.0f,
             decoyPenalty = 2,
-            difficulty = "tutorial"
+            difficulty = "tutorial",
+            backgroundMusic = "tutorial_theme",
+            designNotes = "Default level - fallback configuration",
+            learningObjective = "Complete the level objectives",
+            targetSuccessRate = 0.75f
         };
     }
     
@@ -127,5 +134,26 @@ public class LevelLoader : MonoBehaviour
     {
         loadedLevels.Clear();
         Debug.Log("Level cache cleared");
+    }
+
+    /// <summary>
+    /// Debug method to test level progression
+    /// </summary>
+    [ContextMenu("Test Level Progression")]
+    public void TestLevelProgression()
+    {
+        Debug.Log("=== Testing Level Progression ===");
+        
+        for (int i = 1; i <= 12; i++)
+        {
+            LevelData level = LoadLevel(i);
+            int nextLevel = GetNextLevelId(i);
+            
+            Debug.Log($"Level {i}: {level.levelName} -> Next: {(nextLevel > 0 ? nextLevel.ToString() : "END")}");
+        }
+        
+        // Test beyond level 12
+        int level13 = GetNextLevelId(12);
+        Debug.Log($"Level 13: {(level13 > 0 ? level13.ToString() : "END OF GAME")}");
     }
 }

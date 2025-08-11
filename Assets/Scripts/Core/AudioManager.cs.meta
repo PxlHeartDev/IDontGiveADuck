@@ -7,10 +7,14 @@ MonoImporter:
   - musicSource: {instanceID: 0}
   - sfxSource: {instanceID: 0}
   - uiSource: {instanceID: 0}
-  - menuMusic: {instanceID: 0}
+  - menuMusic: {fileID: 8300000, guid: 9362a74eed4b9a94db2dfc18cdb2c4c0, type: 3}
   - gameplayMusic: {fileID: 8300000, guid: e2e4aee7bc86054428f1e8f8fc496a6a, type: 3}
   - gameOverMusic: {instanceID: 0}
   - victoryMusic: {instanceID: 0}
+  - tutorialTheme: {instanceID: 0}
+  - actionTheme: {instanceID: 0}
+  - challengeTheme: {instanceID: 0}
+  - bossTheme: {instanceID: 0}
   - buttonClickSound: {instanceID: 0}
   - buttonHoverSound: {instanceID: 0}
   - levelStartSound: {instanceID: 0}

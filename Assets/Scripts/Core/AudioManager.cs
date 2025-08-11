@@ -12,31 +12,26 @@ public class AudioManager : MonoBehaviour
     [Header("Audio Sources")]
     [SerializeField] private AudioSource musicSource;
     [SerializeField] private AudioSource sfxSource;
-    [SerializeField] private AudioSource uiSource;
     
     [Header("Background Music")]
     [SerializeField] private AudioClip menuMusic;
-    [SerializeField] private AudioClip gameplayMusic;
     [SerializeField] private AudioClip gameOverMusic;
     [SerializeField] private AudioClip victoryMusic;
     
+    [Header("Level-Specific Music")]
+    [SerializeField] private AudioClip tutorialTheme;
+    [SerializeField] private AudioClip actionTheme;
+    [SerializeField] private AudioClip challengeTheme;
+    [SerializeField] private AudioClip bossTheme;
+    
     [Header("UI Sounds")]
-    [SerializeField] private AudioClip buttonClickSound;
-    [SerializeField] private AudioClip buttonHoverSound;
     [SerializeField] private AudioClip levelStartSound;
     [SerializeField] private AudioClip levelCompleteSound;
     [SerializeField] private AudioClip gameOverSound;
     
     [Header("Duck Sounds")]
-    [SerializeField] private AudioClip duckClickGoodSound;
     [SerializeField] private AudioClip duckClickDecoySound;
-    [SerializeField] private AudioClip duckSpawnSound;
-    [SerializeField] private AudioClip duckExpireSound;
-    
-    [Header("Special Effects")]
-    [SerializeField] private AudioClip timeWarningSound;
-    [SerializeField] private AudioClip powerUpSound;
-    [SerializeField] private AudioClip streakBonusSound;
+    [SerializeField] private AudioClip duckClickGoodSound;
     
     [Header("Volume Settings")]
     [Range(0f, 1f)] public float masterVolume = 1f;
@@ -81,6 +76,7 @@ public class AudioManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnGameStateChanged += OnGameStateChanged;
+            GameManager.Instance.OnLevelLoaded += OnLevelLoaded;
         }
         
         // Start with menu music
@@ -93,6 +89,7 @@ public class AudioManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnGameStateChanged -= OnGameStateChanged;
+            GameManager.Instance.OnLevelLoaded -= OnLevelLoaded;
         }
     }
     
@@ -118,14 +115,6 @@ public class AudioManager : MonoBehaviour
             sfxObj.transform.SetParent(transform);
             sfxSource = sfxObj.AddComponent<AudioSource>();
             sfxSource.playOnAwake = false;
-        }
-        
-        if (uiSource == null)
-        {
-            GameObject uiObj = new GameObject("UISource");
-            uiObj.transform.SetParent(transform);
-            uiSource = uiObj.AddComponent<AudioSource>();
-            uiSource.playOnAwake = false;
         }
         
         // Initialize SFX pool
@@ -274,9 +263,9 @@ public class AudioManager : MonoBehaviour
     {
         if (clip == null || !enableUI) return;
         
-        uiSource.clip = clip;
-        uiSource.volume = uiVolume * masterVolume * volumeScale;
-        uiSource.Play();
+        sfxSource.clip = clip;
+        sfxSource.volume = uiVolume * masterVolume * volumeScale;
+        sfxSource.Play();
     }
     
     private AudioSource GetPooledSFXSource()
@@ -320,7 +309,8 @@ public class AudioManager : MonoBehaviour
                 PlayMusic(menuMusic);
                 break;
             case GameState.Playing:
-                PlayMusic(gameplayMusic);
+                // Level-specific music should already be playing from OnLevelLoaded
+                // Only play the level start sound
                 PlayUISFX(levelStartSound);
                 break;
             case GameState.LevelComplete:
@@ -336,57 +326,76 @@ public class AudioManager : MonoBehaviour
     }
     
     /// <summary>
-    /// Duck click sounds
+    /// Handle level loading for level-specific music
     /// </summary>
-    public void PlayDuckClickGood(Vector3 position)
+    private void OnLevelLoaded(LevelData levelData)
     {
-        PlaySFXAtPosition(duckClickGoodSound, position);
+        // Don't change music if we're in menu state
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Menu)
+        {
+            Debug.Log("In menu state - keeping menu music");
+            return;
+        }
+        
+        // Stop current music to prepare for level-specific music
+        StopMusic();
+        
+        if (levelData != null && !string.IsNullOrEmpty(levelData.backgroundMusic))
+        {
+            AudioClip levelMusic = GetLevelMusic(levelData.backgroundMusic);
+            if (levelMusic != null)
+            {
+                PlayMusic(levelMusic);
+                Debug.Log($"Playing level music: {levelData.backgroundMusic}");
+            }
+            else
+            {
+                Debug.LogWarning($"No music found for: {levelData.backgroundMusic}, using tutorial theme as fallback");
+                PlayMusic(tutorialTheme);
+            }
+        }
+        else
+        {
+            // Fallback to tutorial theme
+            PlayMusic(tutorialTheme);
+        }
     }
     
+    /// <summary>
+    /// Get the appropriate music clip based on the backgroundMusic field
+    /// </summary>
+    private AudioClip GetLevelMusic(string musicName)
+    {
+        switch (musicName.ToLower())
+        {
+            case "tutorial_theme":
+                return tutorialTheme;
+            case "action_theme":
+                return actionTheme;
+            case "challenge_theme":
+                return challengeTheme;
+            case "boss_theme":
+                return bossTheme;
+            default:
+                Debug.LogWarning($"Unknown music theme: {musicName}");
+                return null;
+        }
+    }
+    
+    /// <summary>
+    /// Duck click sounds
+    /// </summary>
     public void PlayDuckClickDecoy(Vector3 position)
     {
         PlaySFXAtPosition(duckClickDecoySound, position);
     }
     
-    public void PlayDuckSpawn(Vector3 position)
-    {
-        PlaySFXAtPosition(duckSpawnSound, position, 0.5f); // Quieter
-    }
-    
-    public void PlayDuckExpire(Vector3 position)
-    {
-        PlaySFXAtPosition(duckExpireSound, position, 0.3f); // Even quieter
-    }
-    
     /// <summary>
-    /// Special game sounds
+    /// Duck click good sound
     /// </summary>
-    public void PlayTimeWarning()
+    public void PlayDuckClickGood(Vector3 position)
     {
-        PlaySFX(timeWarningSound);
-    }
-    
-    public void PlayPowerUp()
-    {
-        PlaySFX(powerUpSound);
-    }
-    
-    public void PlayStreakBonus()
-    {
-        PlaySFX(streakBonusSound);
-    }
-    
-    /// <summary>
-    /// UI button sounds
-    /// </summary>
-    public void PlayButtonClick()
-    {
-        PlayUISFX(buttonClickSound);
-    }
-    
-    public void PlayButtonHover()
-    {
-        PlayUISFX(buttonHoverSound, 0.5f);
+        PlaySFXAtPosition(duckClickGoodSound, position);
     }
     
     #endregion
@@ -403,9 +412,6 @@ public class AudioManager : MonoBehaviour
         
         if (sfxSource != null)
             sfxSource.volume = sfxVolume * masterVolume;
-        
-        if (uiSource != null)
-            uiSource.volume = uiVolume * masterVolume;
         
         // Update active SFX sources
         foreach (AudioSource source in activeSfxSources)
@@ -479,4 +485,124 @@ public class AudioManager : MonoBehaviour
     public AudioClip CurrentMusic => currentMusic;
     
     #endregion
+
+    /// <summary>
+    /// Debug method to test level-specific music
+    /// </summary>
+    [ContextMenu("Test Level Music")]
+    public void TestLevelMusic()
+    {
+        Debug.Log("=== Testing Level-Specific Music ===");
+        
+        string[] testThemes = { "tutorial_theme", "action_theme", "challenge_theme", "boss_theme", "unknown_theme" };
+        
+        foreach (string theme in testThemes)
+        {
+            AudioClip music = GetLevelMusic(theme);
+            Debug.Log($"Theme '{theme}': {(music != null ? music.name : "NOT FOUND")}");
+        }
+    }
+    
+    /// <summary>
+    /// Comprehensive test for audio integration
+    /// </summary>
+    [ContextMenu("Test Audio Integration")]
+    public void TestAudioIntegration()
+    {
+        Debug.Log("=== Testing Audio Integration ===");
+        
+        // Test 1: Level-specific music mapping
+        Debug.Log("Test 1: Level-specific music mapping");
+        TestLevelMusicMapping();
+        
+        // Test 2: Audio persistence simulation
+        Debug.Log("Test 2: Audio persistence simulation");
+        TestAudioPersistence();
+        
+        // Test 3: Volume settings
+        Debug.Log("Test 3: Volume settings");
+        TestVolumeSettings();
+        
+        Debug.Log("=== Audio Integration Test Complete ===");
+    }
+    
+    private void TestLevelMusicMapping()
+    {
+        // Test all expected music themes
+        string[] expectedThemes = { "tutorial_theme", "action_theme", "challenge_theme", "boss_theme" };
+        
+        foreach (string theme in expectedThemes)
+        {
+            AudioClip music = GetLevelMusic(theme);
+            if (music != null)
+            {
+                Debug.Log($"✅ {theme} -> {music.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"❌ {theme} -> NOT ASSIGNED");
+            }
+        }
+        
+        // Test unknown theme
+        AudioClip unknownMusic = GetLevelMusic("unknown_theme");
+        if (unknownMusic == null)
+        {
+            Debug.Log("✅ Unknown theme correctly returns null");
+        }
+        else
+        {
+            Debug.LogWarning("❌ Unknown theme should return null");
+        }
+    }
+    
+    private void TestAudioPersistence()
+    {
+        // Simulate checkpoint restart scenario
+        Debug.Log("Simulating checkpoint restart...");
+        
+        // Save current state
+        bool wasMusicEnabled = enableMusic;
+        float savedMasterVolume = masterVolume;
+        
+        // Test music persistence
+        Debug.Log($"Music enabled: {enableMusic}");
+        Debug.Log($"Master volume: {masterVolume}");
+        Debug.Log($"Current music: {(currentMusic != null ? currentMusic.name : "None")}");
+        
+        // Simulate restart (music should continue playing)
+        if (currentMusic != null)
+        {
+            Debug.Log("✅ Music should persist across checkpoint restarts");
+        }
+        else
+        {
+            Debug.Log("ℹ️ No music currently playing");
+        }
+        
+        // Restore state
+        enableMusic = wasMusicEnabled;
+        masterVolume = savedMasterVolume;
+    }
+    
+    private void TestVolumeSettings()
+    {
+        Debug.Log($"Master Volume: {masterVolume}");
+        Debug.Log($"Music Volume: {musicVolume}");
+        Debug.Log($"SFX Volume: {sfxVolume}");
+        Debug.Log($"UI Volume: {uiVolume}");
+        
+        // Test volume calculations
+        float calculatedMusicVolume = musicVolume * masterVolume;
+        Debug.Log($"Calculated Music Volume: {calculatedMusicVolume}");
+        
+        if (calculatedMusicVolume > 0)
+        {
+            Debug.Log("✅ Volume calculations working");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ Volume may be too low");
+        }
+    }
 }

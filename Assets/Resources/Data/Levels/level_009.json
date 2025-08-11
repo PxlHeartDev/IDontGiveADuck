@@ -1,0 +1,22 @@
+// level_009.json
+{
+  "levelId": 9,
+  "levelName": "Multi-Tasking",
+  "goodDucks": 17,
+  "decoyDucks": 7,
+  "timeLimit": 30,
+  "spawnRate": 1.2,
+  "duckLifetime": 2.3,
+  "decoyPenalty": 4,
+  "sizeDistribution": {
+    "large": 0.30,
+    "medium": 0.50,
+    "small": 0.20
+  },
+  "specialMechanics": ["slow_movement"],
+  "backgroundMusic": "challenge_theme",
+  "difficulty": "hard",
+  "designNotes": "Multi-tasking pressure - many moving targets simultaneously",
+  "targetSuccessRate": 0.45,
+  "learningObjective": "Test player ability to handle multiple complex tasks"
+}

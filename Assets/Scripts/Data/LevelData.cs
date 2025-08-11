@@ -2,7 +2,6 @@ using UnityEngine;
 
 /// <summary>
 /// Data structure for level configuration loaded from JSON files
-/// Save this as: Assets/Scripts/Data/LevelData.cs
 /// </summary>
 [System.Serializable]
 public class LevelData
@@ -22,16 +21,41 @@ public class LevelData
     [Header("Size Distribution")]
     public SizeDistribution sizeDistribution;
     
-    [Header("Special Features")]
+    [Header("Game Features")]
     public string[] specialMechanics;
     public string backgroundMusic;
     public string difficulty;
     
-    // Default constructor for JSON deserialization
+    [Header("Design & Learning")]
+    public string designNotes;
+    public float targetSuccessRate;
+    public string learningObjective;
+    
+    // Default constructor for JSON deserialisation
     public LevelData()
     {
         sizeDistribution = new SizeDistribution();
         specialMechanics = new string[0];
+        designNotes = "";
+        learningObjective = "";
+        targetSuccessRate = 0.75f; // Default 75% success rate
+    }
+    
+    /// <summary>
+    /// Debug method to log level data for testing
+    /// </summary>
+    public void LogLevelData()
+    {
+        Debug.Log($"=== Level {levelId}: {levelName} ===");
+        Debug.Log($"Difficulty: {difficulty}");
+        Debug.Log($"Background Music: {backgroundMusic}");
+        Debug.Log($"Target Success Rate: {targetSuccessRate:P0}");
+        Debug.Log($"Design Notes: {designNotes}");
+        Debug.Log($"Learning Objective: {learningObjective}");
+        Debug.Log($"Special Mechanics: {string.Join(", ", specialMechanics)}");
+        Debug.Log($"Ducks: {goodDucks} good, {decoyDucks} decoys");
+        Debug.Log($"Time: {timeLimit}s, Spawn Rate: {spawnRate}s, Lifetime: {duckLifetime}s");
+        Debug.Log($"Decoy Penalty: {decoyPenalty}s");
     }
 }
 

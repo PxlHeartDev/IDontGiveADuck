@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Decoy duck that penalizes players when clicked
+/// Decoy duck that penalises players when clicked
 /// </summary>
 public class DecoyDuck : BaseDuck
 {
@@ -13,28 +13,17 @@ public class DecoyDuck : BaseDuck
     
     [Header("Visual Distinction")]
     [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private Color decoyColor = Color.red;
     [SerializeField] private bool subtleVisualDifference = true; // Make it harder to distinguish
     
     #region Initialization Override
     
     /// <summary>
-    /// Initialize decoy duck with custom properties
+    /// Initialise decoy duck with custom properties
     /// </summary>
     public override void Initialize(float customLifetime = -1, int customPointValue = -1)
     {
         base.Initialize(customLifetime, customPointValue);
-        
-        // Apply visual distinction if enabled
-        if (spriteRenderer != null && !subtleVisualDifference)
-        {
-            spriteRenderer.color = decoyColor;
-        }
-        else if (spriteRenderer != null && subtleVisualDifference)
-        {
-            // Very subtle tint - harder to spot
-            spriteRenderer.color = Color.Lerp(Color.white, decoyColor, 0.1f);
-        }
+    
     }
     
     #endregion
@@ -43,7 +32,6 @@ public class DecoyDuck : BaseDuck
     
     protected override void OnClicked()
     {
-        Debug.Log($"Decoy duck clicked! Applied {timePenalty}s penalty");
         
         // Notify game manager about penalty
         if (GameManager.Instance != null)
@@ -79,13 +67,13 @@ public class DecoyDuck : BaseDuck
     {
         base.OnDuckSpawned();
         
-        // Decoy duck specific spawn behavior
+        // Decoy duck specific spawn behaviour
         // Could add subtle spawn differences
         
         // Ensure proper tag for identification
         gameObject.tag = "DecoyDuck";
         
-        // Optional: Add subtle behavioral differences
+        // Optional: Add subtle behavioural differences
         if (subtleVisualDifference)
         {
             AddSubtleBehavioralDifferences();
@@ -136,11 +124,7 @@ public class DecoyDuck : BaseDuck
             // Assume the prefab has a script to handle floating animation
         }
         
-        // Screen shake or other dramatic feedback
-        if (Camera.main != null)
-        {
-            StartCoroutine(ScreenShake());
-        }
+        
     }
     
     /// <summary>
@@ -158,64 +142,6 @@ public class DecoyDuck : BaseDuck
         
         // Slight rotation variation
         transform.rotation *= Quaternion.Euler(0, 0, Random.Range(-2f, 2f));
-    }
-    
-    /// <summary>
-    /// Screen shake effect for penalty feedback
-    /// </summary>
-    private System.Collections.IEnumerator ScreenShake()
-    {
-        Vector3 originalPosition = Camera.main.transform.position;
-        float elapsed = 0f;
-        float duration = 0.2f;
-        
-        while (elapsed < duration)
-        {
-            float x = Random.Range(-0.1f, 0.1f);
-            float y = Random.Range(-0.1f, 0.1f);
-            
-            Camera.main.transform.position = originalPosition + new Vector3(x, y, 0);
-            
-            elapsed += Time.deltaTime;
-            
-            yield return null;
-        }
-        
-        Camera.main.transform.position = originalPosition;
-    }
-    
-    #endregion
-    
-    #region Size Variants (for different prefabs)
-    
-    /// <summary>
-    /// Configure duck as large decoy
-    /// </summary>
-    public void SetAsLarge()
-    {
-        timePenalty = 2; // Less penalty for large (easier to avoid)
-        transform.localScale = Vector3.one * 1.2f;
-        gameObject.name = "DecoyDuck_Large";
-    }
-    
-    /// <summary>
-    /// Configure duck as medium decoy
-    /// </summary>
-    public void SetAsMedium()
-    {
-        timePenalty = 3; // Standard penalty
-        transform.localScale = Vector3.one * 1.0f;
-        gameObject.name = "DecoyDuck_Medium";
-    }
-    
-    /// <summary>
-    /// Configure duck as small decoy
-    /// </summary>
-    public void SetAsSmall()
-    {
-        timePenalty = 5; // Higher penalty for small (harder to distinguish)
-        transform.localScale = Vector3.one * 0.7f;
-        gameObject.name = "DecoyDuck_Small";
     }
     
     #endregion

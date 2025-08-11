@@ -1,0 +1,22 @@
+// level_012.json
+{
+  "levelId": 12,
+  "levelName": "Master Challenge",
+  "goodDucks": 23,
+  "decoyDucks": 10,
+  "timeLimit": 30,
+  "spawnRate": 0.95,
+  "duckLifetime": 1.8,
+  "decoyPenalty": 5,
+  "sizeDistribution": {
+    "large": 0.20,
+    "medium": 0.40,
+    "small": 0.40
+  },
+  "specialMechanics": ["fast_movement", "overlapping_spawns", "power_up_recommended"],
+  "backgroundMusic": "boss_theme",
+  "difficulty": "expert",
+  "designNotes": "Final boss showcase - requires power-ups and perfect execution",
+  "targetSuccessRate": 0.25,
+  "learningObjective": "Create epic finale that showcases all learned skills and mechanics"
+}

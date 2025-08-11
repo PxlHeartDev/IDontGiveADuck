@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// Abstract base class for all duck types
 /// Provides common functionality and enforces consistent interface
-/// Save this as: Assets/Scripts/Gameplay/Ducks/BaseDuck.cs
 /// </summary>
 public abstract class BaseDuck : MonoBehaviour
 {
@@ -31,6 +30,34 @@ public abstract class BaseDuck : MonoBehaviour
     protected virtual void Start()
     {
         Initialize();
+        
+        // Auto-fit collider to sprite bounds
+        AutoFitCollider();
+    }
+    
+    /// <summary>
+    /// Automatically fit the BoxCollider2D to the sprite bounds
+    /// </summary>
+    private void AutoFitCollider()
+    {
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        BoxCollider2D boxCollider = GetComponent<BoxCollider2D>();
+        
+        if (spriteRenderer != null && boxCollider != null && spriteRenderer.sprite != null)
+        {
+            // Set collider size to match sprite bounds exactly
+            Vector2 spriteSize = spriteRenderer.sprite.bounds.size;
+            boxCollider.size = spriteSize;
+            
+            // Center the collider
+            boxCollider.offset = Vector2.zero;
+            
+            Debug.Log($"Auto-fitted collider for {gameObject.name}: size = {boxCollider.size}");
+        }
+        else
+        {
+            Debug.LogWarning($"Could not auto-fit collider for {gameObject.name} - missing components");
+        }
     }
     
     protected virtual void Update()
@@ -60,6 +87,9 @@ public abstract class BaseDuck : MonoBehaviour
             if (hitCollider != null && hitCollider.gameObject == gameObject)
             {
                 isClicked = true;
+                // Disable collider to prevent further clicks
+                Collider2D col = GetComponent<Collider2D>();
+                if (col != null) col.enabled = false;
                 OnClicked();
             }
         }
@@ -71,6 +101,9 @@ public abstract class BaseDuck : MonoBehaviour
         if (!isClicked && isInitialized)
         {
             isClicked = true;
+            // Disable collider to prevent further clicks
+            Collider2D col = GetComponent<Collider2D>();
+            if (col != null) col.enabled = false;
             OnClicked();
         }
     }
@@ -80,7 +113,7 @@ public abstract class BaseDuck : MonoBehaviour
     #region Initialization
     
     /// <summary>
-    /// Initialize duck with custom properties
+    /// Initialise duck with custom properties
     /// </summary>
     public virtual void Initialize(float customLifetime = -1, int customPointValue = -1)
     {
@@ -152,7 +185,7 @@ public abstract class BaseDuck : MonoBehaviour
     #region Abstract Methods - Must be implemented by child classes
     
     /// <summary>
-    /// Handle duck click behavior - specific to each duck type
+    /// Handle duck click behaviour - specific to each duck type
     /// </summary>
     protected abstract void OnClicked();
     
@@ -171,7 +204,7 @@ public abstract class BaseDuck : MonoBehaviour
     protected virtual void OnDuckSpawned()
     {
         // Default implementation - can be overridden
-        Debug.Log($"{GetType().Name} spawned with {currentLifetime}s lifetime");
+        Debug.Log($"{GetType().Name} spawned at position {transform.position} with {currentLifetime}s lifetime");
     }
     
     /// <summary>

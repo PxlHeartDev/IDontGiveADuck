@@ -1,0 +1,22 @@
+// level_005.json
+{
+  "levelId": 5,
+  "levelName": "Pattern Practice",
+  "goodDucks": 9,
+  "decoyDucks": 3,
+  "timeLimit": 30,
+  "spawnRate": 1.8,
+  "duckLifetime": 3.2,
+  "decoyPenalty": 3,
+  "sizeDistribution": {
+    "large": 0.50,
+    "medium": 0.40,
+    "small": 0.10
+  },
+  "specialMechanics": ["predictable_sequence"],
+  "backgroundMusic": "action_theme",
+  "difficulty": "easy",
+  "designNotes": "Pattern introduction - predictable spawning helps players",
+  "targetSuccessRate": 0.70,
+  "learningObjective": "Show how predictability can offset increased difficulty"
+}

@@ -5,7 +5,6 @@ using TMPro;
 
 /// <summary>
 /// Manages all UI elements and updates them based on game state
-/// Save this as: Assets/Scripts/Core/UIManager.cs
 /// </summary>
 public class UIManager : MonoBehaviour
 {
@@ -152,7 +151,7 @@ public class UIManager : MonoBehaviour
             int seconds = Mathf.FloorToInt(timeLeft % 60);
             timerText.text = $"Time: {minutes:00}:{seconds:00}";
             
-            // Change color when time is low
+            // Change coloor when time is low
             if (timeLeft <= timerWarningThreshold)
             {
                 timerText.color = Color.Lerp(timerWarningColor, originalTimerColor, timeLeft / timerWarningThreshold);
@@ -182,7 +181,7 @@ public class UIManager : MonoBehaviour
     {
         if (levelText != null)
         {
-            levelText.text = $"Level {levelData.levelId}: {levelData.levelName}";
+            levelText.text = $"Level: {levelData.levelId}";
         }
         
         UpdateProgress();
@@ -334,30 +333,38 @@ public class UIManager : MonoBehaviour
     /// </summary>
     private void ShowLevelComplete()
     {
+        HideHUDElements();
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
-            
+
             if (gameOverTitle != null)
                 gameOverTitle.text = "Level Complete!";
-            
+
             if (finalScoreText != null && GameManager.Instance != null)
                 finalScoreText.text = $"Final Score: {GameManager.Instance.Score:N0}";
-            
-            // Show next level button if available
+
+            // Show next level button if available and update its label to show next level number
             if (nextLevelButton != null)
             {
                 int nextLevel = LevelLoader.Instance?.GetNextLevelId(GameManager.Instance.CurrentLevelId) ?? -1;
                 nextLevelButton.gameObject.SetActive(nextLevel > 0);
+
+                // Fix: Use TextMeshProUGUI for button label
+                var tmpText = nextLevelButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                if (tmpText != null)
+                {
+                    tmpText.text = nextLevel > 0 ? $"Next Level ({nextLevel})" : "Next Level";
+                }
             }
         }
     }
-    
     /// <summary>
     /// Show game over screen
     /// </summary>
     private void ShowGameOver(bool isCompleteGameOver)
     {
+        HideHUDElements();
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
@@ -379,12 +386,13 @@ public class UIManager : MonoBehaviour
     /// </summary>
     private void ShowGameComplete()
     {
+        HideHUDElements();
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
             
             if (gameOverTitle != null)
-                gameOverTitle.text = "Congratulations!\nAll Levels Complete!";
+                gameOverTitle.text = "Game Complete";
             
             if (finalScoreText != null && GameManager.Instance != null)
                 finalScoreText.text = $"Final Score: {GameManager.Instance.Score:N0}";
@@ -465,6 +473,17 @@ public class UIManager : MonoBehaviour
     
     private void OnRestartClicked()
     {
+        // Update restart button text based on checkpoint availability
+        if (GameManager.Instance != null && GameManager.Instance.HasCheckpoint)
+        {
+            // Update button text to show checkpoint info
+            var restartButtonText = restartButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            if (restartButtonText != null)
+            {
+                restartButtonText.text = $"Restart from Checkpoint (Level {GameManager.Instance.CheckpointLevel})";
+            }
+        }
+        
         GameManager.Instance?.RestartLevel();
     }
     
@@ -528,6 +547,11 @@ public class UIManager : MonoBehaviour
         if (spawner != null)
         {
             GUILayout.Label($"Active Ducks: {spawner.ActiveDuckCount}");
+        }
+
+        if (GameManager.Instance != null && GameManager.Instance.HasCheckpoint)
+        {
+            GUILayout.Label($"Checkpoint: Level {GameManager.Instance.CheckpointLevel}");
         }
         
         GUILayout.EndArea();
