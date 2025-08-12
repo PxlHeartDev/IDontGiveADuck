@@ -1,9 +1,7 @@
 using UnityEngine;
-using System.Collections.Generic;
-using System.Collections;
 
 /// <summary>
-/// Centralised audio management system for all game sounds
+/// Simple audio management system for the duck game
 /// </summary>
 public class AudioManager : MonoBehaviour
 {
@@ -35,23 +33,11 @@ public class AudioManager : MonoBehaviour
     
     [Header("Volume Settings")]
     [Range(0f, 1f)] public float masterVolume = 1f;
-    [Range(0f, 1f)] public float musicVolume = 0.7f;
-    [Range(0f, 1f)] public float sfxVolume = 0.8f;
-    [Range(0f, 1f)] public float uiVolume = 0.6f;
-    
-    [Header("Audio Settings")]
-    [SerializeField] private bool enableMusic = true;
-    [SerializeField] private bool enableSFX = true;
-    [SerializeField] private bool enableUI = true;
-    [SerializeField] private float musicFadeSpeed = 1f;
-    
-    // Audio pools for overlapping sounds
-    private Queue<AudioSource> sfxPool = new Queue<AudioSource>();
-    private List<AudioSource> activeSfxSources = new List<AudioSource>();
+    [Range(0f, 1f)] public float musicVolume = 0.2f;  // Much lower music volume
+    [Range(0f, 1f)] public float sfxVolume = 1f;      // Higher SFX volume
     
     // Current music tracking
     private AudioClip currentMusic;
-    private Coroutine musicFadeCoroutine;
     
     #region Unity Lifecycle
     
@@ -72,7 +58,7 @@ public class AudioManager : MonoBehaviour
     
     void Start()
     {
-        // Subscribe to game events for automatic audio
+        // Subscribe to game events
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnGameStateChanged += OnGameStateChanged;
@@ -99,57 +85,26 @@ public class AudioManager : MonoBehaviour
     
     private void InitializeAudioManager()
     {
-        Debug.Log("InitializeAudioManager called");
-        
         // Create audio sources if not assigned
         if (musicSource == null)
         {
-            Debug.Log("Creating music source...");
             GameObject musicObj = new GameObject("MusicSource");
             musicObj.transform.SetParent(transform);
             musicSource = musicObj.AddComponent<AudioSource>();
             musicSource.loop = true;
             musicSource.playOnAwake = false;
-            Debug.Log($"Music source created: {musicSource != null}");
-        }
-        else
-        {
-            Debug.Log($"Music source already exists: {musicSource.name}");
         }
         
         if (sfxSource == null)
         {
-            Debug.Log("Creating SFX source...");
             GameObject sfxObj = new GameObject("SFXSource");
             sfxObj.transform.SetParent(transform);
             sfxSource = sfxObj.AddComponent<AudioSource>();
             sfxSource.playOnAwake = false;
-            Debug.Log($"SFX source created: {sfxSource != null}");
         }
-        else
-        {
-            Debug.Log($"SFX source already exists: {sfxSource.name}");
-        }
-        
-        // Initialize SFX pool
-        CreateSFXPool(5); // Create 5 pooled audio sources
         
         // Apply initial volume settings
         UpdateVolumeSettings();
-        
-        Debug.Log($"AudioManager initialized - Music: {musicSource != null}, SFX: {sfxSource != null}");
-    }
-    
-    private void CreateSFXPool(int poolSize)
-    {
-        for (int i = 0; i < poolSize; i++)
-        {
-            GameObject sfxObj = new GameObject($"PooledSFX_{i}");
-            sfxObj.transform.SetParent(transform);
-            AudioSource source = sfxObj.AddComponent<AudioSource>();
-            source.playOnAwake = false;
-            sfxPool.Enqueue(source);
-        }
     }
     
     #endregion
@@ -157,120 +112,29 @@ public class AudioManager : MonoBehaviour
     #region Music Control
     
     /// <summary>
-    /// Play background music with optional fade
+    /// Play background music
     /// </summary>
-    public void PlayMusic(AudioClip music, bool fade = true)
+    public void PlayMusic(AudioClip music)
     {
-        Debug.Log($"=== PlayMusic ENTRY === with: {(music != null ? music.name : "NULL")}");
-        Debug.Log($"PlayMusic called with: {(music != null ? music.name : "NULL")}, fade: {fade}, enableMusic: {enableMusic}");
+        if (music == null || musicSource == null) return;
         
-        if (music == null || !enableMusic) 
-        {
-            Debug.LogWarning($"PlayMusic failed - music: {(music != null ? "not null" : "NULL")}, enableMusic: {enableMusic}");
-            return;
-        }
+        if (currentMusic == music && musicSource.isPlaying) return;
         
-        if (musicSource == null)
-        {
-            Debug.LogError("PlayMusic failed - musicSource is NULL!");
-            return;
-        }
-        
-        if (currentMusic == music && musicSource.isPlaying) 
-        {
-            Debug.Log("PlayMusic skipped - same music already playing");
-            return;
-        }
-        
-        Debug.Log($"Setting currentMusic to: {music.name}");
         currentMusic = music;
-        
-        if (fade && musicSource.isPlaying)
-        {
-            Debug.Log("Starting music fade...");
-            StartMusicFade(music);
-        }
-        else
-        {
-            Debug.Log($"Playing music directly: {music.name}");
-            musicSource.clip = music;
-            musicSource.Play();
-            Debug.Log($"Music started playing: {musicSource.isPlaying}");
-        }
+        musicSource.clip = music;
+        musicSource.Play();
     }
     
     /// <summary>
-    /// Stop music with optional fade
+    /// Stop music
     /// </summary>
-    public void StopMusic(bool fade = true)
+    public void StopMusic()
     {
-        if (fade)
-        {
-            StartMusicFade(null);
-        }
-        else
+        if (musicSource != null)
         {
             musicSource.Stop();
             currentMusic = null;
         }
-    }
-    
-    /// <summary>
-    /// Fade between music tracks
-    /// </summary>
-    private void StartMusicFade(AudioClip newMusic)
-    {
-        if (musicFadeCoroutine != null)
-        {
-            StopCoroutine(musicFadeCoroutine);
-        }
-        
-        musicFadeCoroutine = StartCoroutine(FadeMusicCoroutine(newMusic));
-    }
-    
-    private IEnumerator FadeMusicCoroutine(AudioClip newMusic)
-    {
-        Debug.Log($"FadeMusicCoroutine started with: {(newMusic != null ? newMusic.name : "NULL")}");
-        float startVolume = musicSource.volume;
-        Debug.Log($"Starting fade with volume: {startVolume}");
-        
-        // Fade out
-        Debug.Log("Starting fade out...");
-        while (musicSource.volume > 0)
-        {
-            musicSource.volume -= startVolume * musicFadeSpeed * Time.deltaTime;
-            yield return null;
-        }
-        
-        Debug.Log("Fade out complete, stopping music");
-        musicSource.Stop();
-        
-        // Switch music
-        if (newMusic != null)
-        {
-            Debug.Log($"Setting new music clip: {newMusic.name}");
-            musicSource.clip = newMusic;
-            Debug.Log("Starting new music playback");
-            musicSource.Play();
-            Debug.Log($"New music started playing: {musicSource.isPlaying}");
-            
-            // Fade in
-            Debug.Log("Starting fade in...");
-            while (musicSource.volume < startVolume)
-            {
-                musicSource.volume += startVolume * musicFadeSpeed * Time.deltaTime;
-                yield return null;
-            }
-            Debug.Log("Fade in complete");
-        }
-        else
-        {
-            Debug.Log("No new music to play");
-        }
-        
-        musicSource.volume = startVolume;
-        musicFadeCoroutine = null;
-        Debug.Log("FadeMusicCoroutine finished");
     }
     
     #endregion
@@ -278,69 +142,28 @@ public class AudioManager : MonoBehaviour
     #region Sound Effects
     
     /// <summary>
-    /// Play a one-shot sound effect
-    /// </summary>
-    public void PlaySFX(AudioClip clip, float volumeScale = 1f)
-    {
-        if (clip == null || !enableSFX) return;
-        
-        AudioSource source = GetPooledSFXSource();
-        if (source != null)
-        {
-            source.clip = clip;
-            source.volume = sfxVolume * masterVolume * volumeScale;
-            source.Play();
-            
-            StartCoroutine(ReturnToPoolWhenFinished(source));
-        }
-    }
-    
-    /// <summary>
     /// Play sound effect at a specific world position
     /// </summary>
-    public void PlaySFXAtPosition(AudioClip clip, Vector3 position, float volumeScale = 1f)
+    public void PlaySFXAtPosition(AudioClip clip, Vector3 position)
     {
-        if (clip == null || !enableSFX) return;
-        
-        AudioSource.PlayClipAtPoint(clip, position, sfxVolume * masterVolume * volumeScale);
+        if (clip == null) return;
+        // Increase volume for duck sounds to make them more prominent
+        float duckVolumeMultiplier = 10.0f; // 10x louder than regular SFX
+        float finalVolume = sfxVolume * masterVolume * duckVolumeMultiplier;
+        Debug.Log($"PlaySFXAtPosition: clip={clip.name}, volume={finalVolume}, sfxVolume={sfxVolume}, masterVolume={masterVolume}");
+        AudioSource.PlayClipAtPoint(clip, position, finalVolume);
     }
     
     /// <summary>
     /// Play UI sound effect
     /// </summary>
-    public void PlayUISFX(AudioClip clip, float volumeScale = 1f)
+    public void PlayUISFX(AudioClip clip)
     {
-        if (clip == null || !enableUI) return;
+        if (clip == null || sfxSource == null) return;
         
         sfxSource.clip = clip;
-        sfxSource.volume = uiVolume * masterVolume * volumeScale;
+        sfxSource.volume = sfxVolume * masterVolume;
         sfxSource.Play();
-    }
-    
-    private AudioSource GetPooledSFXSource()
-    {
-        if (sfxPool.Count > 0)
-        {
-            AudioSource source = sfxPool.Dequeue();
-            activeSfxSources.Add(source);
-            return source;
-        }
-        
-        // Create new source if pool is empty
-        GameObject sfxObj = new GameObject("DynamicSFX");
-        sfxObj.transform.SetParent(transform);
-        AudioSource newSource = sfxObj.AddComponent<AudioSource>();
-        newSource.playOnAwake = false;
-        activeSfxSources.Add(newSource);
-        return newSource;
-    }
-    
-    private IEnumerator ReturnToPoolWhenFinished(AudioSource source)
-    {
-        yield return new WaitWhile(() => source.isPlaying);
-        
-        activeSfxSources.Remove(source);
-        sfxPool.Enqueue(source);
     }
     
     #endregion
@@ -358,8 +181,6 @@ public class AudioManager : MonoBehaviour
                 PlayMusic(menuMusic);
                 break;
             case GameState.Playing:
-                // Level-specific music should already be playing from OnLevelLoaded
-                // Only play the level start sound
                 PlayUISFX(levelStartSound);
                 break;
             case GameState.LevelComplete:
@@ -367,7 +188,6 @@ public class AudioManager : MonoBehaviour
                 PlayMusic(victoryMusic);
                 break;
             case GameState.GameOver:
-            case GameState.CompleteGameOver:
                 PlayUISFX(gameOverSound);
                 PlayMusic(gameOverMusic);
                 break;
@@ -379,43 +199,27 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     private void OnLevelLoaded(LevelData levelData)
     {
-        Debug.Log($"OnLevelLoaded called with levelData: {(levelData != null ? levelData.levelName : "NULL")}");
-        Debug.Log($"Current GameState: {GameManager.Instance?.CurrentState}");
-        
         // Don't change music if we're in menu state
         if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Menu)
         {
-            Debug.Log("In menu state - keeping menu music");
             return;
         }
         
-        // PlayMusic will handle stopping current music and transitioning to new music
-        // No need to call StopMusic() here as it causes conflicts with the fade system
-        
         if (levelData != null && !string.IsNullOrEmpty(levelData.backgroundMusic))
         {
-            Debug.Log($"Level backgroundMusic: '{levelData.backgroundMusic}'");
             AudioClip levelMusic = GetLevelMusic(levelData.backgroundMusic);
-            Debug.Log($"GetLevelMusic returned: {(levelMusic != null ? levelMusic.name : "NULL")}");
-            
             if (levelMusic != null)
             {
-                Debug.Log($"About to call PlayMusic with: {levelMusic.name}");
-                Debug.Log($"PlayMusic called with: {levelData.backgroundMusic}");
                 PlayMusic(levelMusic);
             }
             else
             {
-                Debug.LogWarning($"No music found for: {levelData.backgroundMusic}, using tutorial theme as fallback");
-                Debug.Log($"tutorialTheme is: {(tutorialTheme != null ? tutorialTheme.name : "NULL")}");
-                PlayMusic(tutorialTheme);
+                PlayMusic(tutorialTheme); // Fallback
             }
         }
         else
         {
-            Debug.LogWarning("No backgroundMusic specified in level data, using tutorial theme as fallback");
-            Debug.Log($"tutorialTheme is: {(tutorialTheme != null ? tutorialTheme.name : "NULL")}");
-            PlayMusic(tutorialTheme);
+            PlayMusic(tutorialTheme); // Fallback
         }
     }
     
@@ -424,24 +228,17 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     private AudioClip GetLevelMusic(string musicName)
     {
-        Debug.Log($"GetLevelMusic called with: '{musicName}'");
-        
         switch (musicName.ToLower())
         {
             case "tutorial_theme":
-                Debug.Log($"Returning tutorialTheme: {(tutorialTheme != null ? tutorialTheme.name : "NULL")}");
                 return tutorialTheme;
             case "action_theme":
-                Debug.Log($"Returning actionTheme: {(actionTheme != null ? actionTheme.name : "NULL")}");
                 return actionTheme;
             case "challenge_theme":
-                Debug.Log($"Returning challengeTheme: {(challengeTheme != null ? challengeTheme.name : "NULL")}");
                 return challengeTheme;
             case "boss_theme":
-                Debug.Log($"Returning bossTheme: {(bossTheme != null ? bossTheme.name : "NULL")}");
                 return bossTheme;
             default:
-                Debug.LogWarning($"Unknown music theme: {musicName}");
                 return null;
         }
     }
@@ -451,6 +248,13 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlayDuckClickDecoy(Vector3 position)
     {
+        Debug.Log("PlayDuckClickDecoy called");
+        if (duckClickDecoySound == null)
+        {
+            Debug.LogError("duckClickDecoySound is NULL! Assign it in the Inspector.");
+            return;
+        }
+        Debug.Log($"Playing decoy sound: {duckClickDecoySound.name}");
         PlaySFXAtPosition(duckClickDecoySound, position);
     }
     
@@ -459,6 +263,13 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlayDuckClickGood(Vector3 position)
     {
+        Debug.Log("PlayDuckClickGood called");
+        if (duckClickGoodSound == null)
+        {
+            Debug.LogError("duckClickGoodSound is NULL! Assign it in the Inspector.");
+            return;
+        }
+        Debug.Log($"Playing good duck sound: {duckClickGoodSound.name}");
         PlaySFXAtPosition(duckClickGoodSound, position);
     }
     
@@ -476,13 +287,6 @@ public class AudioManager : MonoBehaviour
         
         if (sfxSource != null)
             sfxSource.volume = sfxVolume * masterVolume;
-        
-        // Update active SFX sources
-        foreach (AudioSource source in activeSfxSources)
-        {
-            if (source != null)
-                source.volume = sfxVolume * masterVolume;
-        }
     }
     
     /// <summary>
@@ -512,161 +316,12 @@ public class AudioManager : MonoBehaviour
         UpdateVolumeSettings();
     }
     
-    /// <summary>
-    /// Toggle audio categories
-    /// </summary>
-    public void ToggleMusic()
-    {
-        enableMusic = !enableMusic;
-        if (!enableMusic && musicSource.isPlaying)
-        {
-            musicSource.Pause();
-        }
-        else if (enableMusic && !musicSource.isPlaying && currentMusic != null)
-        {
-            musicSource.UnPause();
-        }
-    }
-    
-    public void ToggleSFX()
-    {
-        enableSFX = !enableSFX;
-    }
-    
-    public void ToggleUI()
-    {
-        enableUI = !enableUI;
-    }
-    
     #endregion
     
     #region Public Getters
     
-    public bool IsMusicEnabled => enableMusic;
-    public bool IsSFXEnabled => enableSFX;
-    public bool IsUIEnabled => enableUI;
     public bool IsMusicPlaying => musicSource != null && musicSource.isPlaying;
     public AudioClip CurrentMusic => currentMusic;
     
     #endregion
-
-    /// <summary>
-    /// Debug method to test level-specific music
-    /// </summary>
-    [ContextMenu("Test Level Music")]
-    public void TestLevelMusic()
-    {
-        Debug.Log("=== Testing Level-Specific Music ===");
-        
-        string[] testThemes = { "tutorial_theme", "action_theme", "challenge_theme", "boss_theme", "unknown_theme" };
-        
-        foreach (string theme in testThemes)
-        {
-            AudioClip music = GetLevelMusic(theme);
-            Debug.Log($"Theme '{theme}': {(music != null ? music.name : "NOT FOUND")}");
-        }
-    }
-    
-    /// <summary>
-    /// Comprehensive test for audio integration
-    /// </summary>
-    [ContextMenu("Test Audio Integration")]
-    public void TestAudioIntegration()
-    {
-        Debug.Log("=== Testing Audio Integration ===");
-        
-        // Test 1: Level-specific music mapping
-        Debug.Log("Test 1: Level-specific music mapping");
-        TestLevelMusicMapping();
-        
-        // Test 2: Audio persistence simulation
-        Debug.Log("Test 2: Audio persistence simulation");
-        TestAudioPersistence();
-        
-        // Test 3: Volume settings
-        Debug.Log("Test 3: Volume settings");
-        TestVolumeSettings();
-        
-        Debug.Log("=== Audio Integration Test Complete ===");
-    }
-    
-    private void TestLevelMusicMapping()
-    {
-        // Test all expected music themes
-        string[] expectedThemes = { "tutorial_theme", "action_theme", "challenge_theme", "boss_theme" };
-        
-        foreach (string theme in expectedThemes)
-        {
-            AudioClip music = GetLevelMusic(theme);
-            if (music != null)
-            {
-                Debug.Log($"✅ {theme} -> {music.name}");
-            }
-            else
-            {
-                Debug.LogWarning($"❌ {theme} -> NOT ASSIGNED");
-            }
-        }
-        
-        // Test unknown theme
-        AudioClip unknownMusic = GetLevelMusic("unknown_theme");
-        if (unknownMusic == null)
-        {
-            Debug.Log("✅ Unknown theme correctly returns null");
-        }
-        else
-        {
-            Debug.LogWarning("❌ Unknown theme should return null");
-        }
-    }
-    
-    private void TestAudioPersistence()
-    {
-        // Simulate checkpoint restart scenario
-        Debug.Log("Simulating checkpoint restart...");
-        
-        // Save current state
-        bool wasMusicEnabled = enableMusic;
-        float savedMasterVolume = masterVolume;
-        
-        // Test music persistence
-        Debug.Log($"Music enabled: {enableMusic}");
-        Debug.Log($"Master volume: {masterVolume}");
-        Debug.Log($"Current music: {(currentMusic != null ? currentMusic.name : "None")}");
-        
-        // Simulate restart (music should continue playing)
-        if (currentMusic != null)
-        {
-            Debug.Log("✅ Music should persist across checkpoint restarts");
-        }
-        else
-        {
-            Debug.Log("ℹ️ No music currently playing");
-        }
-        
-        // Restore state
-        enableMusic = wasMusicEnabled;
-        masterVolume = savedMasterVolume;
-    }
-    
-    private void TestVolumeSettings()
-    {
-        Debug.Log($"Master Volume: {masterVolume}");
-        Debug.Log($"Music Volume: {musicVolume}");
-        Debug.Log($"SFX Volume: {sfxVolume}");
-        Debug.Log($"UI Volume: {uiVolume}");
-        
-        // Test volume calculations
-        float calculatedMusicVolume = musicVolume * masterVolume;
-        Debug.Log($"Calculated Music Volume: {calculatedMusicVolume}");
-        
-        if (calculatedMusicVolume > 0)
-        {
-            Debug.Log("✅ Volume calculations working");
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ Volume may be too low");
-        }
-    }
 }

@@ -1,10 +1,9 @@
-// level_008.json
 {
   "levelId": 8,
   "levelName": "Duck Hunt",
   "goodDucks": 15,
   "decoyDucks": 6,
-  "timeLimit": 30,
+  "timeLimit": 35,
   "spawnRate": 1.3,
   "duckLifetime": 2.5,
   "decoyPenalty": 4,
@@ -16,7 +15,8 @@
   "specialMechanics": ["slow_movement"],
   "backgroundMusic": "challenge_theme",
   "difficulty": "medium",
-  "designNotes": "Moving ducks introduction - test adaptation to new mechanics",
+  "designNotes": "Extended time prepares for power-up introduction - moving mechanics with breathing room",
   "targetSuccessRate": 0.50,
-  "learningObjective": "Introduce movement mechanics without overwhelming players"
+  "learningObjective": "Introduce movement mechanics without overwhelming players",
+  "powerUpsAvailable": false
 }

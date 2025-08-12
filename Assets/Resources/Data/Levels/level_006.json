@@ -1,4 +1,3 @@
-// level_006.json
 {
   "levelId": 6,
   "levelName": "Precision Test",
@@ -16,7 +15,8 @@
   "specialMechanics": [],
   "backgroundMusic": "action_theme",
   "difficulty": "medium",
-  "designNotes": "Speed/accuracy balance - faster but more precise",
+  "designNotes": "First 30-second level - transition to standard game length with precision focus",
   "targetSuccessRate": 0.65,
-  "learningObjective": "Balance speed increases with precision requirements"
+  "learningObjective": "Balance speed increases with precision requirements",
+  "powerUpsAvailable": false
 }

@@ -10,20 +10,15 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     
     [Header("Game Configuration")]
-    [SerializeField] private int startingLives = 3;
+    [SerializeField] private int startingLives = 1; // Single life - sudden death
     [SerializeField] private int currentLevelId = 1;
-    [SerializeField] private int checkpointLevel = 6; // Checkpoint at level 6 (halfway through 12 levels)
     
     [Header("Current Game State")]
     [SerializeField] private int score = 0;
-    [SerializeField] private int lives = 3;
+    [SerializeField] private int lives = 1; // Single life
     [SerializeField] private float timeLeft = 30f;
     [SerializeField] private int goodDucksClicked = 0;
     [SerializeField] private int goodDucksMissed = 0;
-    
-    // Checkpoint system
-    private CheckpointData checkpointData;
-    private bool hasCheckpoint = false;
     
     // Level configuration
     private LevelData currentLevel;
@@ -39,27 +34,6 @@ public class GameManager : MonoBehaviour
     public System.Action<float> OnTimeChanged;
     public System.Action<GameState> OnGameStateChanged;
     public System.Action<LevelData> OnLevelLoaded;
-    
-    #region Checkpoint Data Structure
-    
-    [System.Serializable]
-    public class CheckpointData
-    {
-        public int checkpointLevel;
-        public int savedScore;
-        public int savedLives;
-        public int currentLevel;
-        
-        public CheckpointData(int level, int score, int lives, int current)
-        {
-            checkpointLevel = level;
-            savedScore = score;
-            savedLives = lives;
-            currentLevel = current;
-        }
-    }
-    
-    #endregion
     
     #region Unity Lifecycle
     
@@ -101,82 +75,7 @@ public class GameManager : MonoBehaviour
         score = 0;
         currentState = GameState.Menu;
         
-        // Load checkpoint data if it exists
-        LoadCheckpointData();
-        
         Debug.Log("GameManager initialized");
-    }
-    
-    #endregion
-    
-    #region Checkpoint System
-    
-    /// <summary>
-    /// Save checkpoint data to PlayerPrefs
-    /// </summary>
-    private void SaveCheckpointData()
-    {
-        if (checkpointData != null)
-        {
-            string json = JsonUtility.ToJson(checkpointData);
-            PlayerPrefs.SetString("CheckpointData", json);
-            PlayerPrefs.Save();
-            Debug.Log($"Checkpoint saved at level {checkpointData.checkpointLevel}");
-        }
-    }
-    
-    /// <summary>
-    /// Load checkpoint data from PlayerPrefs
-    /// </summary>
-    private void LoadCheckpointData()
-    {
-        if (PlayerPrefs.HasKey("CheckpointData"))
-        {
-            string json = PlayerPrefs.GetString("CheckpointData");
-            checkpointData = JsonUtility.FromJson<CheckpointData>(json);
-            hasCheckpoint = true;
-            Debug.Log($"Checkpoint loaded from level {checkpointData.checkpointLevel}");
-        }
-        else
-        {
-            hasCheckpoint = false;
-            Debug.Log("No checkpoint data found");
-        }
-    }
-    
-    /// <summary>
-    /// Clear checkpoint data (for complete game restart)
-    /// </summary>
-    private void ClearCheckpointData()
-    {
-        PlayerPrefs.DeleteKey("CheckpointData");
-        checkpointData = null;
-        hasCheckpoint = false;
-        Debug.Log("Checkpoint data cleared");
-    }
-    
-    /// <summary>
-    /// Check if current level is a checkpoint level
-    /// </summary>
-    private bool IsCheckpointLevel(int levelId)
-    {
-        return levelId == checkpointLevel;
-    }
-    
-    /// <summary>
-    /// Save checkpoint when reaching checkpoint level
-    /// </summary>
-    private void SaveCheckpoint()
-    {
-        checkpointData = new CheckpointData(
-            currentLevelId,
-            score,
-            lives,
-            currentLevelId
-        );
-        hasCheckpoint = true;
-        SaveCheckpointData();
-        Debug.Log($"Checkpoint saved at level {currentLevelId} with score {score} and lives {lives}");
     }
     
     #endregion
@@ -220,12 +119,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void AdvanceToNextLevel()
     {
-        // Save checkpoint if this was a checkpoint level
-        if (IsCheckpointLevel(currentLevelId))
-        {
-            SaveCheckpoint();
-        }
-        
         int nextLevelId = LevelLoader.Instance.GetNextLevelId(currentLevelId);
         
         if (nextLevelId > 0)
@@ -246,23 +139,43 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void RestartLevel()
     {
-        if (hasCheckpoint && checkpointData != null)
+        Debug.Log("=== RestartLevel called - Complete game reset ===");
+        
+        // Stop any existing spawner first
+        DuckSpawner spawner = FindFirstObjectByType<DuckSpawner>();
+        if (spawner != null)
         {
-            // Restart from checkpoint
-            currentLevelId = checkpointData.checkpointLevel;
-            score = checkpointData.savedScore;
-            lives = checkpointData.savedLives;
-            
-            Debug.Log($"Restarting from checkpoint: Level {currentLevelId}, Score {score}, Lives {lives}");
+            Debug.Log("Stopping existing spawner");
+            spawner.StopSpawning();
         }
         else
         {
-            // No checkpoint, restart from current level with current score
-            Debug.Log($"No checkpoint found, restarting from current level {currentLevelId}");
+            Debug.LogWarning("No DuckSpawner found during restart");
         }
         
+        // Complete game reset - always restart from level 1
+        Debug.Log("Restarting from level 1 (complete reset)");
+        currentLevelId = 1;
+        score = 0;
+        lives = 1; // Reset to single life
+        
+        // Reset all game state
+        timeLeft = 30f;
+        goodDucksClicked = 0;
+        goodDucksMissed = 0;
+        totalDucksSpawned = 0;
+        levelStartTime = 0f;
+        
+        // Update UI
+        OnLivesChanged?.Invoke(lives);
+        OnScoreChanged?.Invoke(score);
+        OnTimeChanged?.Invoke(timeLeft);
+        
+        // Load the level and show menu (don't auto-start)
         LoadCurrentLevel();
-        StartGame(false); // Not from menu - LoadCurrentLevel already triggered OnLevelLoaded
+        currentState = GameState.Menu;
+        OnGameStateChanged?.Invoke(currentState);
+        Debug.Log("Restart complete - showing menu with complete reset");
     }
     
     #endregion
@@ -283,6 +196,7 @@ public class GameManager : MonoBehaviour
         }
         
         Debug.Log($"Starting game with level: {currentLevel.levelName}");
+        Debug.Log($"Level config - Good ducks: {currentLevel.goodDucks}, Decoys: {currentLevel.decoyDucks}, Time: {currentLevel.timeLimit}s");
         
         // Change state to Playing
         currentState = GameState.Playing;
@@ -301,12 +215,13 @@ public class GameManager : MonoBehaviour
         DuckSpawner spawner = FindFirstObjectByType<DuckSpawner>();
         if (spawner != null)
         {
-            Debug.Log("Found DuckSpawner, starting spawning");
+            Debug.Log($"Found DuckSpawner: {spawner.name}, starting spawning");
             spawner.StartSpawning(currentLevel);
+            Debug.Log("DuckSpawner.StartSpawning() called");
         }
         else
         {
-            Debug.LogError("DuckSpawner not found!");
+            Debug.LogError("DuckSpawner not found! Make sure DuckSpawner is in the scene.");
         }
         
         // Notify UI
@@ -484,21 +399,11 @@ public class GameManager : MonoBehaviour
     
     private void HandleGameOver()
     {
-        lives--;
-        OnLivesChanged?.Invoke(lives);
+        Debug.Log($"Game Over! Single life lost - sudden death!");
         
-        Debug.Log($"Game Over! Lives remaining: {lives}");
-        
-        if (lives <= 0)
-        {
-            // Complete game over - reset everything and clear checkpoint
-            Debug.Log("All lives lost - complete game over!");
-            lives = startingLives; // Reset lives for next game
-            OnLivesChanged?.Invoke(lives); // Update UI
-            ClearCheckpointData(); // Clear checkpoint data
-            currentState = GameState.CompleteGameOver;
-            OnGameStateChanged?.Invoke(currentState);
-        }
+        // Don't automatically restart - show game over screen instead
+        // The restart logic is handled in RestartLevel() when player clicks restart button
+        Debug.Log("Showing game over screen - player must click restart to continue");
     }
     
     private void CompleteGame()
@@ -522,8 +427,6 @@ public class GameManager : MonoBehaviour
     public int GoodDucksClicked => goodDucksClicked;
     public int GoodDucksRequired => currentLevel?.goodDucks ?? 0;
     public float LevelProgress => currentLevel != null ? (float)goodDucksClicked / currentLevel.goodDucks : 0f;
-    public bool HasCheckpoint => hasCheckpoint;
-    public int CheckpointLevel => checkpointData?.checkpointLevel ?? -1;
     
     #endregion
     
@@ -535,7 +438,6 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         Time.timeScale = 1f;
-        ClearCheckpointData(); // Clear checkpoint for fresh start
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     
@@ -553,30 +455,6 @@ public class GameManager : MonoBehaviour
     
     #endregion
 
-    /// <summary>
-    /// Debug method to test checkpoint system
-    /// </summary>
-    [ContextMenu("Test Checkpoint System")]
-    public void TestCheckpointSystem()
-    {
-        Debug.Log("=== Testing Checkpoint System ===");
-        Debug.Log($"Checkpoint Level: {checkpointLevel}");
-        Debug.Log($"Current Level: {currentLevelId}");
-        Debug.Log($"Has Checkpoint: {hasCheckpoint}");
-        
-        if (checkpointData != null)
-        {
-            Debug.Log($"Checkpoint Data - Level: {checkpointData.checkpointLevel}, Score: {checkpointData.savedScore}, Lives: {checkpointData.savedLives}");
-        }
-        
-        // Test checkpoint detection for various levels
-        for (int i = 1; i <= 12; i++)
-        {
-            bool isCheckpoint = IsCheckpointLevel(i);
-            Debug.Log($"Level {i}: {(isCheckpoint ? "CHECKPOINT" : "Normal")}");
-        }
-    }
-    
     /// <summary>
     /// Debug method to test level loading and audio integration
     /// </summary>
@@ -629,6 +507,5 @@ public enum GameState
     Paused,
     LevelComplete,
     GameOver,
-    CompleteGameOver,
     GameComplete
 }

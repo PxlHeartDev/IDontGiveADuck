@@ -1,10 +1,9 @@
-// level_012.json
 {
   "levelId": 12,
   "levelName": "Master Challenge",
   "goodDucks": 23,
   "decoyDucks": 10,
-  "timeLimit": 30,
+  "timeLimit": 40,
   "spawnRate": 0.95,
   "duckLifetime": 1.8,
   "decoyPenalty": 5,
@@ -13,10 +12,17 @@
     "medium": 0.40,
     "small": 0.40
   },
-  "specialMechanics": ["fast_movement", "overlapping_spawns", "power_up_recommended"],
+  "specialMechanics": ["fast_movement", "overlapping_spawns", "power_up_required"],
   "backgroundMusic": "boss_theme",
   "difficulty": "expert",
-  "designNotes": "Final boss showcase - requires power-ups and perfect execution",
+  "designNotes": "Epic finale requiring perfect execution and power-up mastery - 40% small ducks for maximum precision challenge",
   "targetSuccessRate": 0.25,
-  "learningObjective": "Create epic finale that showcases all learned skills and mechanics"
+  "learningObjective": "Create epic finale that showcases all learned skills and mechanics",
+  "powerUpsAvailable": true,
+  "recommendedStrategy": "Multiple power-ups required - plan usage carefully across 40-second battle",
+  "victoryBonus": {
+    "extraCoins": 500,
+    "unlockMessage": "Master Duck Hunter Achieved!",
+    "specialReward": "golden_duck_skin"
+  }
 }

@@ -230,9 +230,6 @@ public class UIManager : MonoBehaviour
             case GameState.GameOver:
                 ShowGameOver(false);
                 break;
-            case GameState.CompleteGameOver:
-                ShowGameOver(true);
-                break;
             case GameState.GameComplete:
                 ShowGameComplete();
                 break;
@@ -281,13 +278,15 @@ public class UIManager : MonoBehaviour
     private void ShowInstructions()
     {
         Debug.Log("UIManager: ShowInstructions() called");
+        Debug.Log($"InstructionsPanel reference: {(instructionsPanel != null ? instructionsPanel.name : "NULL")}");
+        
         SetAllPanelsInactive();
         HideHUDElements(); // Hide HUD during instructions
         
         if (instructionsPanel != null)
         {
             instructionsPanel.SetActive(true);
-            Debug.Log("UIManager: Instructions panel activated");
+            Debug.Log($"UIManager: Instructions panel activated - Active: {instructionsPanel.activeSelf}");
             
             if (instructionsText != null)
             {
@@ -296,13 +295,21 @@ public class UIManager : MonoBehaviour
                     "• Click the GOOD ducks to earn points\n" +
                     "• Avoid clicking DECOY ducks (they cost time)\n" +
                     "• Complete each level before time runs out\n" +
-                    "• Small ducks = More points, but harder to click\n\n" +
+                    "• Small ducks = More points, but harder to click\n" +
+                    "• Single life - sudden death!\n" +
+                    "• Fail any level = restart from Level 1\n" +
+                    "• Click 'Restart' to continue after failing\n\n" +
                     "Good luck!";
+                Debug.Log("UIManager: Instructions text updated");
+            }
+            else
+            {
+                Debug.LogError("UIManager: Instructions text is null!");
             }
         }
         else
         {
-            Debug.LogError("UIManager: Instructions panel is null!");
+            Debug.LogError("UIManager: Instructions panel is null! Check UIManager assignment in Inspector.");
         }
     }
     
@@ -370,10 +377,16 @@ public class UIManager : MonoBehaviour
             gameOverPanel.SetActive(true);
             
             if (gameOverTitle != null)
-                gameOverTitle.text = isCompleteGameOver ? "Game Over!" : "Level Failed!";
+            {
+                // Single life system - always sudden death
+                gameOverTitle.text = "Level Failed!";
+            }
             
             if (finalScoreText != null && GameManager.Instance != null)
-                finalScoreText.text = $"Final Score: {GameManager.Instance.Score:N0}";
+            {
+                // Simple restart message
+                finalScoreText.text = "Restart from Level 1";
+            }
             
             // Hide next level button for game over
             if (nextLevelButton != null)
@@ -438,7 +451,7 @@ public class UIManager : MonoBehaviour
     
     private void OnStartGameClicked()
     {
-        Debug.Log("Start Game button clicked!");
+        Debug.Log("=== OnStartGameClicked called ===");
         
         // Try multiple ways to hide instructions panel
         if (instructionsPanel != null)
@@ -467,23 +480,13 @@ public class UIManager : MonoBehaviour
             return;
         }
         
-        Debug.Log("Calling GameManager.StartGame()");
+        Debug.Log("Calling GameManager.StartGame(true) - coming from menu");
         GameManager.Instance.StartGame(true); // Coming from menu
+        Debug.Log("GameManager.StartGame() call completed");
     }
     
     private void OnRestartClicked()
     {
-        // Update restart button text based on checkpoint availability
-        if (GameManager.Instance != null && GameManager.Instance.HasCheckpoint)
-        {
-            // Update button text to show checkpoint info
-            var restartButtonText = restartButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-            if (restartButtonText != null)
-            {
-                restartButtonText.text = $"Restart from Checkpoint (Level {GameManager.Instance.CheckpointLevel})";
-            }
-        }
-        
         GameManager.Instance?.RestartLevel();
     }
     
@@ -547,11 +550,6 @@ public class UIManager : MonoBehaviour
         if (spawner != null)
         {
             GUILayout.Label($"Active Ducks: {spawner.ActiveDuckCount}");
-        }
-
-        if (GameManager.Instance != null && GameManager.Instance.HasCheckpoint)
-        {
-            GUILayout.Label($"Checkpoint: Level {GameManager.Instance.CheckpointLevel}");
         }
         
         GUILayout.EndArea();

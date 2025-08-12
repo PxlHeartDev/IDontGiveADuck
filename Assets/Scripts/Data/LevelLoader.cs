@@ -1,19 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.IO;
 
 /// <summary>
-/// Handles loading and caching level data from JSON files
-/// /// </summary>
+/// Handles loading level data from JSON files in Resources/Data/Levels
+/// </summary>
 public class LevelLoader : MonoBehaviour
 {
     public static LevelLoader Instance { get; private set; }
     
-    [Header("Level Settings")]
-    [SerializeField] private string levelsPath = "Data/Levels/";
-    
-    // Cache loaded levels for performance
-    private Dictionary<int, LevelData> loadedLevels = new Dictionary<int, LevelData>();
+    private Dictionary<int, LevelData> levelCache = new Dictionary<int, LevelData>();
     
     void Awake()
     {
@@ -30,145 +25,91 @@ public class LevelLoader : MonoBehaviour
     }
     
     /// <summary>
-    /// Loads level data from JSON file or cache
+    /// Load a specific level by ID
     /// </summary>
     public LevelData LoadLevel(int levelId)
     {
-        Debug.Log($"LoadLevel called for level {levelId}");
-        
         // Check cache first
-        if (loadedLevels.ContainsKey(levelId))
+        if (levelCache.ContainsKey(levelId))
         {
-            Debug.Log($"Loading Level {levelId} from cache");
-            return loadedLevels[levelId];
+            return levelCache[levelId];
         }
         
-        // Load from Resources folder
-        string fileName = $"level_{levelId:000}";
-        Debug.Log($"Loading from file: {fileName}");
-        string jsonText = LoadLevelFile(fileName);
+        // Load from Resources
+        string fileName = $"level_{levelId:D3}"; // Format as "level_001", "level_002", etc.
+        TextAsset levelFile = Resources.Load<TextAsset>($"Data/Levels/{fileName}");
         
-        if (string.IsNullOrEmpty(jsonText))
+        if (levelFile != null)
         {
-            Debug.LogWarning($"Could not load level {levelId}, using default");
-            return CreateDefaultLevel(levelId);
+            try
+            {
+                LevelData levelData = JsonUtility.FromJson<LevelData>(levelFile.text);
+                levelCache[levelId] = levelData;
+                return levelData;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to parse level {levelId}: {e.Message}");
+                return CreateDefaultLevel(levelId);
+            }
         }
-        
-        try
+        else
         {
-            Debug.Log($"Parsing JSON for level {levelId}");
-            LevelData levelData = JsonUtility.FromJson<LevelData>(jsonText);
-            levelData.sizeDistribution.Normalize();
-            
-            // Cache the loaded level
-            loadedLevels[levelId] = levelData;
-            Debug.Log($"Successfully loaded Level {levelId}: {levelData.levelName}");
-            
-            // Debug: Log the new fields to verify JSON loading
-            levelData.LogLevelData();
-            
-            return levelData;
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"Error parsing level {levelId}: {e.Message}");
+            Debug.LogWarning($"Level file not found: {fileName}");
             return CreateDefaultLevel(levelId);
         }
     }
     
     /// <summary>
-    /// Loads JSON text from Resources folder
+    /// Get the next level ID, or -1 if no more levels
     /// </summary>
-    private string LoadLevelFile(string fileName)
+    public int GetNextLevelId(int currentLevelId)
     {
-        try
-        {
-            Debug.Log($"Attempting to load level file: {fileName}");
-            TextAsset textAsset = Resources.Load<TextAsset>($"{levelsPath}{fileName}");
-            
-            if (textAsset != null)
-            {
-                Debug.Log($"Successfully loaded {fileName}, text length: {textAsset.text.Length}");
-                return textAsset.text;
-            }
-            else
-            {
-                Debug.LogWarning($"TextAsset is null for {fileName} - file not found in Resources/{levelsPath}");
-                return null;
-            }
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"Failed to load level file {fileName}: {e.Message}");
-            return null;
-        }
+        int nextLevelId = currentLevelId + 1;
+        string fileName = $"level_{nextLevelId:D3}";
+        TextAsset levelFile = Resources.Load<TextAsset>($"Data/Levels/{fileName}");
+        
+        return levelFile != null ? nextLevelId : -1;
     }
     
     /// <summary>
-    /// Creates a fallback level configuration
+    /// Create a default level if loading fails
     /// </summary>
     private LevelData CreateDefaultLevel(int levelId)
     {
-        return new LevelData
+        LevelData defaultLevel = new LevelData
         {
             levelId = levelId,
             levelName = $"Default Level {levelId}",
             goodDucks = 3,
-            decoyDucks = 0,
+            decoyDucks = 1,
             timeLimit = 30f,
             spawnRate = 3.0f,
             duckLifetime = 5.0f,
-            decoyPenalty = 2,
-            difficulty = "tutorial",
+            decoyPenalty = 3,
+            sizeDistribution = new LevelData.SizeDistribution
+            {
+                large = 0.6f,
+                medium = 0.3f,
+                small = 0.1f
+            },
+            specialMechanics = new string[0],
             backgroundMusic = "tutorial_theme",
-            designNotes = "Default level - fallback configuration",
-            learningObjective = "Complete the level objectives",
-            targetSuccessRate = 0.75f
+            difficulty = "normal",
+            designNotes = "Default level created due to missing level file",
+            targetSuccessRate = 0.8f,
+            learningObjective = "Complete the level",
+            powerUpsAvailable = false
         };
+        
+        return defaultLevel;
     }
     
     /// <summary>
-    /// Gets next level ID or returns -1 if no more levels
+    /// Clear the level cache
     /// </summary>
-    public int GetNextLevelId(int currentLevelId)
-    {
-        int nextId = currentLevelId + 1;
-        
-        // Try to load next level to see if it exists
-        string fileName = $"level_{nextId:000}";
-        TextAsset textAsset = Resources.Load<TextAsset>($"{levelsPath}{fileName}");
-        
-        return textAsset != null ? nextId : -1;
-    }
-    
-    /// <summary>
-    /// Clears level cache (useful for development)
-    /// </summary>
-    [ContextMenu("Clear Level Cache")]
     public void ClearCache()
     {
-        loadedLevels.Clear();
-        Debug.Log("Level cache cleared");
-    }
-
-    /// <summary>
-    /// Debug method to test level progression
-    /// </summary>
-    [ContextMenu("Test Level Progression")]
-    public void TestLevelProgression()
-    {
-        Debug.Log("=== Testing Level Progression ===");
-        
-        for (int i = 1; i <= 12; i++)
-        {
-            LevelData level = LoadLevel(i);
-            int nextLevel = GetNextLevelId(i);
-            
-            Debug.Log($"Level {i}: {level.levelName} -> Next: {(nextLevel > 0 ? nextLevel.ToString() : "END")}");
-        }
-        
-        // Test beyond level 12
-        int level13 = GetNextLevelId(12);
-        Debug.Log($"Level 13: {(level13 > 0 ? level13.ToString() : "END OF GAME")}");
+        levelCache.Clear();
     }
 }

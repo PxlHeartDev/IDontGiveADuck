@@ -1,10 +1,9 @@
-// level_003.json
 {
   "levelId": 3,
   "levelName": "Building Skills",
   "goodDucks": 5,
   "decoyDucks": 1,
-  "timeLimit": 30,
+  "timeLimit": 25,
   "spawnRate": 2.2,
   "duckLifetime": 4.0,
   "decoyPenalty": 2,
@@ -16,7 +15,8 @@
   "specialMechanics": [],
   "backgroundMusic": "tutorial_theme",
   "difficulty": "easy",
-  "designNotes": "Establish baseline difficulty and size variety",
+  "designNotes": "First small ducks appear - establish baseline difficulty quickly",
   "targetSuccessRate": 0.85,
-  "learningObjective": "Introduce small ducks and establish rhythm"
+  "learningObjective": "Introduce small ducks and establish rhythm",
+  "powerUpsAvailable": false
 }

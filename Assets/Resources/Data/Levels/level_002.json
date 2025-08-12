@@ -1,11 +1,9 @@
-
-// level_002.json
 {
   "levelId": 2,
   "levelName": "First Challenge",
   "goodDucks": 4,
   "decoyDucks": 1,
-  "timeLimit": 30,
+  "timeLimit": 25,
   "spawnRate": 2.5,
   "duckLifetime": 4.5,
   "decoyPenalty": 2,
@@ -17,7 +15,8 @@
   "specialMechanics": [],
   "backgroundMusic": "tutorial_theme",
   "difficulty": "tutorial",
-  "designNotes": "Introduce decoys gradually - teach consequences",
+  "designNotes": "Introduce decoys with minimal penalty - quick learning cycle",
   "targetSuccessRate": 0.90,
-  "learningObjective": "Introduce decoy concept with minimal penalty"
+  "learningObjective": "Introduce decoy concept with minimal penalty",
+  "powerUpsAvailable": false
 }

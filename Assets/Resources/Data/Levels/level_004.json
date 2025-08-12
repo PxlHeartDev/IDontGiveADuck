@@ -1,10 +1,9 @@
-// level_004.json
 {
   "levelId": 4,
   "levelName": "Speed Increase",
   "goodDucks": 7,
   "decoyDucks": 2,
-  "timeLimit": 30,
+  "timeLimit": 25,
   "spawnRate": 2.0,
   "duckLifetime": 3.5,
   "decoyPenalty": 2,
@@ -16,7 +15,8 @@
   "specialMechanics": [],
   "backgroundMusic": "action_theme",
   "difficulty": "easy",
-  "designNotes": "Multi-parameter scaling - speed AND count increase",
+  "designNotes": "Multi-parameter scaling demo - speed AND count increase in short timeframe",
   "targetSuccessRate": 0.75,
-  "learningObjective": "Demonstrate how multiple parameters create progression"
+  "learningObjective": "Demonstrate how multiple parameters create progression",
+  "powerUpsAvailable": false
 }

@@ -320,7 +320,7 @@ public class DuckSpawner : MonoBehaviour
         }
         
         float rand = Random.value;
-        SizeDistribution dist = currentLevel.sizeDistribution;
+        LevelData.SizeDistribution dist = currentLevel.sizeDistribution;
         
         if (rand < dist.large)
             return goodDuckPrefabs[0]; // Large
@@ -342,7 +342,7 @@ public class DuckSpawner : MonoBehaviour
         }
         
         float rand = Random.value;
-        SizeDistribution dist = currentLevel.sizeDistribution;
+        LevelData.SizeDistribution dist = currentLevel.sizeDistribution;
         
         if (rand < dist.large)
             return decoyDuckPrefabs[0]; // Large

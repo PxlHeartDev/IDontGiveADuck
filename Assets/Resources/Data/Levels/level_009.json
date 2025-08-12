@@ -1,10 +1,9 @@
-// level_009.json
 {
   "levelId": 9,
   "levelName": "Multi-Tasking",
   "goodDucks": 17,
   "decoyDucks": 7,
-  "timeLimit": 30,
+  "timeLimit": 35,
   "spawnRate": 1.2,
   "duckLifetime": 2.3,
   "decoyPenalty": 4,
@@ -13,10 +12,16 @@
     "medium": 0.50,
     "small": 0.20
   },
-  "specialMechanics": ["slow_movement"],
+  "specialMechanics": ["slow_movement", "power_up_tutorial"],
   "backgroundMusic": "challenge_theme",
   "difficulty": "hard",
-  "designNotes": "Multi-tasking pressure - many moving targets simultaneously",
+  "designNotes": "Power-up introduction level - extra time allows learning new mechanics",
   "targetSuccessRate": 0.45,
-  "learningObjective": "Test player ability to handle multiple complex tasks"
+  "learningObjective": "Test player ability to handle multiple complex tasks + introduce power-ups",
+  "powerUpsAvailable": true,
+  "powerUpTutorial": {
+    "timeBoost": "Adds 5 seconds to timer - use when running low on time",
+    "slowTime": "Slows duck movement for 2 seconds - use during swarm spawns",
+    "coinMultiplier": "Doubles coin value for next 5 ducks - use on small ducks"
+  }
 }

@@ -1,4 +1,3 @@
-// level_007.json
 {
   "levelId": 7,
   "levelName": "The Jump",
@@ -16,7 +15,8 @@
   "specialMechanics": [],
   "backgroundMusic": "challenge_theme",
   "difficulty": "medium",
-  "designNotes": "Significant difficulty jump - test player adaptation",
+  "designNotes": "Significant difficulty spike - test player adaptation within standard timeframe",
   "targetSuccessRate": 0.55,
-  "learningObjective": "Create noticeable difficulty spike that challenges but doesn't break players"
+  "learningObjective": "Create noticeable difficulty spike that challenges but doesn't break players",
+  "powerUpsAvailable": false
 }
