@@ -99,22 +99,36 @@ public class AudioManager : MonoBehaviour
     
     private void InitializeAudioManager()
     {
+        Debug.Log("InitializeAudioManager called");
+        
         // Create audio sources if not assigned
         if (musicSource == null)
         {
+            Debug.Log("Creating music source...");
             GameObject musicObj = new GameObject("MusicSource");
             musicObj.transform.SetParent(transform);
             musicSource = musicObj.AddComponent<AudioSource>();
             musicSource.loop = true;
             musicSource.playOnAwake = false;
+            Debug.Log($"Music source created: {musicSource != null}");
+        }
+        else
+        {
+            Debug.Log($"Music source already exists: {musicSource.name}");
         }
         
         if (sfxSource == null)
         {
+            Debug.Log("Creating SFX source...");
             GameObject sfxObj = new GameObject("SFXSource");
             sfxObj.transform.SetParent(transform);
             sfxSource = sfxObj.AddComponent<AudioSource>();
             sfxSource.playOnAwake = false;
+            Debug.Log($"SFX source created: {sfxSource != null}");
+        }
+        else
+        {
+            Debug.Log($"SFX source already exists: {sfxSource.name}");
         }
         
         // Initialize SFX pool
@@ -123,7 +137,7 @@ public class AudioManager : MonoBehaviour
         // Apply initial volume settings
         UpdateVolumeSettings();
         
-        Debug.Log("AudioManager initialized");
+        Debug.Log($"AudioManager initialized - Music: {musicSource != null}, SFX: {sfxSource != null}");
     }
     
     private void CreateSFXPool(int poolSize)
@@ -147,20 +161,41 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlayMusic(AudioClip music, bool fade = true)
     {
-        if (music == null || !enableMusic) return;
+        Debug.Log($"=== PlayMusic ENTRY === with: {(music != null ? music.name : "NULL")}");
+        Debug.Log($"PlayMusic called with: {(music != null ? music.name : "NULL")}, fade: {fade}, enableMusic: {enableMusic}");
         
-        if (currentMusic == music && musicSource.isPlaying) return;
+        if (music == null || !enableMusic) 
+        {
+            Debug.LogWarning($"PlayMusic failed - music: {(music != null ? "not null" : "NULL")}, enableMusic: {enableMusic}");
+            return;
+        }
         
+        if (musicSource == null)
+        {
+            Debug.LogError("PlayMusic failed - musicSource is NULL!");
+            return;
+        }
+        
+        if (currentMusic == music && musicSource.isPlaying) 
+        {
+            Debug.Log("PlayMusic skipped - same music already playing");
+            return;
+        }
+        
+        Debug.Log($"Setting currentMusic to: {music.name}");
         currentMusic = music;
         
         if (fade && musicSource.isPlaying)
         {
+            Debug.Log("Starting music fade...");
             StartMusicFade(music);
         }
         else
         {
+            Debug.Log($"Playing music directly: {music.name}");
             musicSource.clip = music;
             musicSource.Play();
+            Debug.Log($"Music started playing: {musicSource.isPlaying}");
         }
     }
     
@@ -195,33 +230,47 @@ public class AudioManager : MonoBehaviour
     
     private IEnumerator FadeMusicCoroutine(AudioClip newMusic)
     {
+        Debug.Log($"FadeMusicCoroutine started with: {(newMusic != null ? newMusic.name : "NULL")}");
         float startVolume = musicSource.volume;
+        Debug.Log($"Starting fade with volume: {startVolume}");
         
         // Fade out
+        Debug.Log("Starting fade out...");
         while (musicSource.volume > 0)
         {
             musicSource.volume -= startVolume * musicFadeSpeed * Time.deltaTime;
             yield return null;
         }
         
+        Debug.Log("Fade out complete, stopping music");
         musicSource.Stop();
         
         // Switch music
         if (newMusic != null)
         {
+            Debug.Log($"Setting new music clip: {newMusic.name}");
             musicSource.clip = newMusic;
+            Debug.Log("Starting new music playback");
             musicSource.Play();
+            Debug.Log($"New music started playing: {musicSource.isPlaying}");
             
             // Fade in
+            Debug.Log("Starting fade in...");
             while (musicSource.volume < startVolume)
             {
                 musicSource.volume += startVolume * musicFadeSpeed * Time.deltaTime;
                 yield return null;
             }
+            Debug.Log("Fade in complete");
+        }
+        else
+        {
+            Debug.Log("No new music to play");
         }
         
         musicSource.volume = startVolume;
         musicFadeCoroutine = null;
+        Debug.Log("FadeMusicCoroutine finished");
     }
     
     #endregion
@@ -330,6 +379,9 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     private void OnLevelLoaded(LevelData levelData)
     {
+        Debug.Log($"OnLevelLoaded called with levelData: {(levelData != null ? levelData.levelName : "NULL")}");
+        Debug.Log($"Current GameState: {GameManager.Instance?.CurrentState}");
+        
         // Don't change music if we're in menu state
         if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Menu)
         {
@@ -337,26 +389,32 @@ public class AudioManager : MonoBehaviour
             return;
         }
         
-        // Stop current music to prepare for level-specific music
-        StopMusic();
+        // PlayMusic will handle stopping current music and transitioning to new music
+        // No need to call StopMusic() here as it causes conflicts with the fade system
         
         if (levelData != null && !string.IsNullOrEmpty(levelData.backgroundMusic))
         {
+            Debug.Log($"Level backgroundMusic: '{levelData.backgroundMusic}'");
             AudioClip levelMusic = GetLevelMusic(levelData.backgroundMusic);
+            Debug.Log($"GetLevelMusic returned: {(levelMusic != null ? levelMusic.name : "NULL")}");
+            
             if (levelMusic != null)
             {
+                Debug.Log($"About to call PlayMusic with: {levelMusic.name}");
+                Debug.Log($"PlayMusic called with: {levelData.backgroundMusic}");
                 PlayMusic(levelMusic);
-                Debug.Log($"Playing level music: {levelData.backgroundMusic}");
             }
             else
             {
                 Debug.LogWarning($"No music found for: {levelData.backgroundMusic}, using tutorial theme as fallback");
+                Debug.Log($"tutorialTheme is: {(tutorialTheme != null ? tutorialTheme.name : "NULL")}");
                 PlayMusic(tutorialTheme);
             }
         }
         else
         {
-            // Fallback to tutorial theme
+            Debug.LogWarning("No backgroundMusic specified in level data, using tutorial theme as fallback");
+            Debug.Log($"tutorialTheme is: {(tutorialTheme != null ? tutorialTheme.name : "NULL")}");
             PlayMusic(tutorialTheme);
         }
     }
@@ -366,15 +424,21 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     private AudioClip GetLevelMusic(string musicName)
     {
+        Debug.Log($"GetLevelMusic called with: '{musicName}'");
+        
         switch (musicName.ToLower())
         {
             case "tutorial_theme":
+                Debug.Log($"Returning tutorialTheme: {(tutorialTheme != null ? tutorialTheme.name : "NULL")}");
                 return tutorialTheme;
             case "action_theme":
+                Debug.Log($"Returning actionTheme: {(actionTheme != null ? actionTheme.name : "NULL")}");
                 return actionTheme;
             case "challenge_theme":
+                Debug.Log($"Returning challengeTheme: {(challengeTheme != null ? challengeTheme.name : "NULL")}");
                 return challengeTheme;
             case "boss_theme":
+                Debug.Log($"Returning bossTheme: {(bossTheme != null ? bossTheme.name : "NULL")}");
                 return bossTheme;
             default:
                 Debug.LogWarning($"Unknown music theme: {musicName}");

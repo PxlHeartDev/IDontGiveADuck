@@ -468,7 +468,7 @@ public class UIManager : MonoBehaviour
         }
         
         Debug.Log("Calling GameManager.StartGame()");
-        GameManager.Instance.StartGame();
+        GameManager.Instance.StartGame(true); // Coming from menu
     }
     
     private void OnRestartClicked()

@@ -232,7 +232,7 @@ public class GameManager : MonoBehaviour
         {
             currentLevelId = nextLevelId;
             LoadCurrentLevel();
-            StartGame();
+            StartGame(false); // Not from menu - LoadCurrentLevel already triggered OnLevelLoaded
         }
         else
         {
@@ -262,7 +262,7 @@ public class GameManager : MonoBehaviour
         }
         
         LoadCurrentLevel();
-        StartGame();
+        StartGame(false); // Not from menu - LoadCurrentLevel already triggered OnLevelLoaded
     }
     
     #endregion
@@ -272,9 +272,9 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Start the current level
     /// </summary>
-    public void StartGame()
+    public void StartGame(bool fromMenu = false)
     {
-        Debug.Log("GameManager.StartGame() called");
+        Debug.Log($"GameManager.StartGame() called (fromMenu: {fromMenu})");
         
         if (currentLevel == null)
         {
@@ -284,7 +284,17 @@ public class GameManager : MonoBehaviour
         
         Debug.Log($"Starting game with level: {currentLevel.levelName}");
         
+        // Change state to Playing
         currentState = GameState.Playing;
+        
+        // Only trigger OnLevelLoaded if we're coming from Menu state
+        // (when advancing levels, LoadCurrentLevel already triggered OnLevelLoaded)
+        if (fromMenu)
+        {
+            Debug.Log("StartGame: Triggering OnLevelLoaded for music transition from menu");
+            OnLevelLoaded?.Invoke(currentLevel);
+        }
+        
         levelStartTime = Time.time;
         
         // Configure spawner

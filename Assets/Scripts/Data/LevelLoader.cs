@@ -34,6 +34,8 @@ public class LevelLoader : MonoBehaviour
     /// </summary>
     public LevelData LoadLevel(int levelId)
     {
+        Debug.Log($"LoadLevel called for level {levelId}");
+        
         // Check cache first
         if (loadedLevels.ContainsKey(levelId))
         {
@@ -43,6 +45,7 @@ public class LevelLoader : MonoBehaviour
         
         // Load from Resources folder
         string fileName = $"level_{levelId:000}";
+        Debug.Log($"Loading from file: {fileName}");
         string jsonText = LoadLevelFile(fileName);
         
         if (string.IsNullOrEmpty(jsonText))
@@ -53,6 +56,7 @@ public class LevelLoader : MonoBehaviour
         
         try
         {
+            Debug.Log($"Parsing JSON for level {levelId}");
             LevelData levelData = JsonUtility.FromJson<LevelData>(jsonText);
             levelData.sizeDistribution.Normalize();
             
@@ -79,8 +83,19 @@ public class LevelLoader : MonoBehaviour
     {
         try
         {
+            Debug.Log($"Attempting to load level file: {fileName}");
             TextAsset textAsset = Resources.Load<TextAsset>($"{levelsPath}{fileName}");
-            return textAsset?.text;
+            
+            if (textAsset != null)
+            {
+                Debug.Log($"Successfully loaded {fileName}, text length: {textAsset.text.Length}");
+                return textAsset.text;
+            }
+            else
+            {
+                Debug.LogWarning($"TextAsset is null for {fileName} - file not found in Resources/{levelsPath}");
+                return null;
+            }
         }
         catch (System.Exception e)
         {
