@@ -2,61 +2,86 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Central game management system - handles game state, scoring, level progression
-/// Save this as: Assets/Scripts/Core/GameManager.cs
+/// GameManager - The central nervous system of the game
+/// 
+/// This class demonstrates several important game development concepts:
+/// - Singleton Pattern: Ensures only one game manager exists
+/// - State Machine: Manages different game states (Menu, Playing, Paused, etc.)
+/// - Event-Driven Architecture: Notifies other systems of game changes
+/// - Game Loop: Controls the main game flow and progression
+/// - Score System: Tracks player progress and achievements
+/// - Level Management: Handles level loading and progression
+/// - Input Handling: Processes player interactions with game objects
 /// </summary>
 public class GameManager : MonoBehaviour
 {
+    // Singleton pattern - accessible from anywhere in the game
     public static GameManager Instance { get; private set; }
     
     [Header("Game Configuration")]
-    [SerializeField] private int startingLives = 1; // Single life - sudden death
-    [SerializeField] private int currentLevelId = 1;
+    [SerializeField] private int startingLives = 1;    // Number of lives player starts with
+    [SerializeField] private int currentLevelId = 1;   // Current level being played
+    
+    [Header("Testing Tools")]
+    [SerializeField] private int testLevelId = 12;     // Level to jump to for testing
+    [SerializeField] private bool enableTestTools = true; // Enable/disable test tools in inspector
     
     [Header("Current Game State")]
-    [SerializeField] private int score = 0;
-    [SerializeField] private int lives = 1; // Single life
-    [SerializeField] private float timeLeft = 30f;
-    [SerializeField] private int goodDucksClicked = 0;
-    [SerializeField] private int goodDucksMissed = 0;
+    [SerializeField] private int score = 0;             // Player's current score
+    [SerializeField] private int lives = 1;             // Remaining lives
+    [SerializeField] private float timeLeft = 30f;      // Time remaining in current level
+    [SerializeField] private int goodDucksClicked = 0;  // Number of good ducks clicked
+    [SerializeField] private int goodDucksMissed = 0;   // Number of good ducks missed
     
-    // Level configuration
-    private LevelData currentLevel;
-    private GameState currentState = GameState.Menu;
+    // Private state variables
+    private LevelData currentLevel;                     // Data for the current level
+    private GameState currentState = GameState.Menu;    // Current game state
+    private float levelStartTime;                       // When the level started
+    private int totalDucksSpawned = 0;                  // Total ducks spawned this level
     
-    // Game statistics
-    private float levelStartTime;
-    private int totalDucksSpawned = 0;
-    
-    // Events for UI updates
-    public System.Action<int> OnScoreChanged;
-    public System.Action<int> OnLivesChanged;
-    public System.Action<float> OnTimeChanged;
-    public System.Action<GameState> OnGameStateChanged;
-    public System.Action<LevelData> OnLevelLoaded;
+    // Events that other systems can subscribe to
+    // This creates loose coupling between systems
+    public System.Action<int> OnScoreChanged;           // Fired when score changes
+    public System.Action<int> OnLivesChanged;           // Fired when lives change
+    public System.Action<float> OnTimeChanged;          // Fired when time changes
+    public System.Action<GameState> OnGameStateChanged; // Fired when game state changes
+    public System.Action<LevelData> OnLevelLoaded;      // Fired when a new level is loaded
     
     #region Unity Lifecycle
     
+    /// <summary>
+    /// Called when the GameObject is created
+    /// Sets up the singleton pattern and initialises the game
+    /// </summary>
     void Awake()
     {
-        // Singleton pattern
+        // Singleton pattern implementation
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject); // Keep alive when scenes change
             InitializeGame();
         }
         else
         {
+            // Destroy duplicate instances
             Destroy(gameObject);
         }
     }
     
+    /// <summary>
+    /// Called after Awake, when the GameObject becomes active
+    /// Loads the first level to start the game
+    /// </summary>
     void Start()
     {
         LoadCurrentLevel();
     }
     
+    /// <summary>
+    /// Called every frame
+    /// Updates the game timer when actively playing
+    /// </summary>
     void Update()
     {
         if (currentState == GameState.Playing)
@@ -67,15 +92,17 @@ public class GameManager : MonoBehaviour
     
     #endregion
     
-    #region Initialization
+    #region Initialisation
     
+    /// <summary>
+    /// Sets up the initial game state
+    /// Called once when the game starts
+    /// </summary>
     private void InitializeGame()
     {
         lives = startingLives;
         score = 0;
         currentState = GameState.Menu;
-        
-        Debug.Log("GameManager initialized");
     }
     
     #endregion
@@ -83,7 +110,12 @@ public class GameManager : MonoBehaviour
     #region Level Management
     
     /// <summary>
-    /// Load and configure the current level
+    /// Loads the current level data and resets level-specific variables
+    /// 
+    /// This method:
+    /// 1. Loads level data from JSON files
+    /// 2. Resets level-specific counters
+    /// 3. Notifies other systems about the new level
     /// </summary>
     private void LoadCurrentLevel()
     {
@@ -93,6 +125,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         
+        // Load level data from JSON file
         currentLevel = LevelLoader.Instance.LoadLevel(currentLevelId);
         
         if (currentLevel == null)
@@ -101,21 +134,21 @@ public class GameManager : MonoBehaviour
             return;
         }
         
-        // Reset level-specific values
+        // Reset level-specific variables
         timeLeft = currentLevel.timeLimit;
         goodDucksClicked = 0;
         goodDucksMissed = 0;
         totalDucksSpawned = 0;
         
-        // Notify systems about level load
+        // Notify other systems (UI, Audio) about the new level
         OnLevelLoaded?.Invoke(currentLevel);
-        
-        Debug.Log($"Level {currentLevel.levelId} loaded: {currentLevel.levelName}");
-        Debug.Log($"Target: {currentLevel.goodDucks} good ducks, {currentLevel.decoyDucks} decoys");
     }
     
     /// <summary>
-    /// Advance to the next level
+    /// Advances to the next level in sequence
+    /// 
+    /// Checks if there are more levels available
+    /// If no more levels, completes the game
     /// </summary>
     public void AdvanceToNextLevel()
     {
@@ -125,7 +158,7 @@ public class GameManager : MonoBehaviour
         {
             currentLevelId = nextLevelId;
             LoadCurrentLevel();
-            StartGame(false); // Not from menu - LoadCurrentLevel already triggered OnLevelLoaded
+            StartGame(false);
         }
         else
         {
@@ -135,55 +168,79 @@ public class GameManager : MonoBehaviour
     }
     
     /// <summary>
-    /// Jump directly to a specific level (for testing)
+    /// Jumps directly to a specific level (for testing)
+    /// 
+    /// Stops current spawning, loads the target level, and starts the game
     /// </summary>
     public void JumpToLevel(int levelId)
     {
-        Debug.Log($"GameManager.JumpToLevel({levelId}) called");
-        
-        // Stop any existing spawner first
+        // Stop current duck spawning
         DuckSpawner spawner = FindFirstObjectByType<DuckSpawner>();
         if (spawner != null)
         {
             spawner.StopSpawning();
         }
         
-        // Set the target level
         currentLevelId = levelId;
-        
-        // Load the level
         LoadCurrentLevel();
-        
-        // Start the game immediately
         StartGame(false);
-        
-        Debug.Log($"Jumped to level {levelId}: {currentLevel?.levelName}");
     }
     
     /// <summary>
-    /// Restart from the latest checkpoint or current level if no checkpoint
+    /// Jumps to the test level specified in the inspector
+    /// 
+    /// This method can be called from the inspector for easy testing
     /// </summary>
-    public void RestartLevel()
+    [ContextMenu("Jump To Test Level")]
+    public void JumpToTestLevel()
     {
-        Debug.Log("=== RestartLevel called - Complete game reset ===");
-        
-        // Stop any existing spawner first
-        DuckSpawner spawner = FindFirstObjectByType<DuckSpawner>();
-        if (spawner != null)
+        if (enableTestTools)
         {
-            Debug.Log("Stopping existing spawner");
-            spawner.StopSpawning();
+            Debug.Log($"Jumping to test level: {testLevelId}");
+            JumpToLevel(testLevelId);
         }
         else
         {
-            Debug.LogWarning("No DuckSpawner found during restart");
+            Debug.LogWarning("Test tools are disabled. Enable 'enableTestTools' to use this feature.");
+        }
+    }
+    
+    /// <summary>
+    /// Jumps to a specific level (for inspector use)
+    /// 
+    /// This method can be called from the inspector with a specific level number
+    /// </summary>
+    [ContextMenu("Jump To Level 1")]
+    public void JumpToLevel1() => JumpToLevel(1);
+    
+    [ContextMenu("Jump To Level 5")]
+    public void JumpToLevel5() => JumpToLevel(5);
+    
+    [ContextMenu("Jump To Level 10")]
+    public void JumpToLevel10() => JumpToLevel(10);
+    
+    [ContextMenu("Jump To Level 12")]
+    public void JumpToLevel12() => JumpToLevel(12);
+    
+    /// <summary>
+    /// Restarts the entire game from level 1
+    /// 
+    /// This is a complete reset - all progress is lost
+    /// Returns the player to the main menu
+    /// </summary>
+    public void RestartLevel()
+    {
+        // Stop current duck spawning
+        DuckSpawner spawner = FindFirstObjectByType<DuckSpawner>();
+        if (spawner != null)
+        {
+            spawner.StopSpawning();
         }
         
-        // Complete game reset - always restart from level 1
-        Debug.Log("Restarting from level 1 (complete reset)");
+        // Complete reset to level 1
         currentLevelId = 1;
         score = 0;
-        lives = 1; // Reset to single life
+        lives = 1;
         
         // Reset all game state
         timeLeft = 30f;
@@ -192,16 +249,15 @@ public class GameManager : MonoBehaviour
         totalDucksSpawned = 0;
         levelStartTime = 0f;
         
-        // Update UI
+        // Update UI with reset values
         OnLivesChanged?.Invoke(lives);
         OnScoreChanged?.Invoke(score);
         OnTimeChanged?.Invoke(timeLeft);
         
-        // Load the level and show menu (don't auto-start)
+        // Load level 1 and return to menu
         LoadCurrentLevel();
         currentState = GameState.Menu;
         OnGameStateChanged?.Invoke(currentState);
-        Debug.Log("Restart complete - showing menu with complete reset");
     }
     
     #endregion
@@ -209,77 +265,71 @@ public class GameManager : MonoBehaviour
     #region Game Flow Control
     
     /// <summary>
-    /// Start the current level
+    /// Starts the current level
+    /// 
+    /// This method:
+    /// 1. Validates that a level is loaded
+    /// 2. Changes game state to Playing
+    /// 3. Starts duck spawning
+    /// 4. Notifies other systems of the state change
     /// </summary>
     public void StartGame(bool fromMenu = false)
     {
-        Debug.Log($"GameManager.StartGame() called (fromMenu: {fromMenu})");
-        
         if (currentLevel == null)
         {
             Debug.LogError("Cannot start game - no level loaded!");
             return;
         }
         
-        Debug.Log($"Starting game with level: {currentLevel.levelName}");
-        Debug.Log($"Level config - Good ducks: {currentLevel.goodDucks}, Decoys: {currentLevel.decoyDucks}, Time: {currentLevel.timeLimit}s");
-        
-        // Change state to Playing
         currentState = GameState.Playing;
         
-        // Only trigger OnLevelLoaded if we're coming from Menu state
-        // (when advancing levels, LoadCurrentLevel already triggered OnLevelLoaded)
+        // Only trigger level load event if coming from menu
+        // (prevents duplicate audio/music changes when advancing levels)
         if (fromMenu)
         {
-            Debug.Log("StartGame: Triggering OnLevelLoaded for music transition from menu");
             OnLevelLoaded?.Invoke(currentLevel);
         }
         
         levelStartTime = Time.time;
         
-        // Configure spawner
+        // Start spawning ducks
         DuckSpawner spawner = FindFirstObjectByType<DuckSpawner>();
         if (spawner != null)
         {
-            Debug.Log($"Found DuckSpawner: {spawner.name}, starting spawning");
             spawner.StartSpawning(currentLevel);
-            Debug.Log("DuckSpawner.StartSpawning() called");
         }
         else
         {
             Debug.LogError("DuckSpawner not found! Make sure DuckSpawner is in the scene.");
         }
         
-        // Notify UI
+        // Notify other systems of state change
         OnGameStateChanged?.Invoke(currentState);
-        
-        Debug.Log($"Game started - Level {currentLevel.levelId}");
     }
     
     /// <summary>
-    /// End the current game/level
+    /// Ends the current level (win or lose)
+    /// 
+    /// This method:
+    /// 1. Sets the appropriate game state
+    /// 2. Stops duck spawning
+    /// 3. Handles level completion or game over
     /// </summary>
     public void EndGame(bool won)
     {
         currentState = won ? GameState.LevelComplete : GameState.GameOver;
         
-        // Stop spawner
+        // Stop spawning ducks
         DuckSpawner spawner = FindFirstObjectByType<DuckSpawner>();
         if (spawner != null)
         {
             spawner.StopSpawning();
         }
         
-        // Calculate final stats
-        float levelTime = Time.time - levelStartTime;
-        float accuracy = totalDucksSpawned > 0 ? (float)goodDucksClicked / totalDucksSpawned : 0f;
-        
-        Debug.Log($"Level {(won ? "WON" : "LOST")} in {levelTime:F1}s - Accuracy: {accuracy:P1}");
-        
-        // Notify UI
+        // Notify other systems of state change
         OnGameStateChanged?.Invoke(currentState);
         
-        // Handle level completion or game over
+        // Handle the result
         if (won)
         {
             HandleLevelComplete();
@@ -291,19 +341,22 @@ public class GameManager : MonoBehaviour
     }
     
     /// <summary>
-    /// Pause/unpause the game
+    /// Pauses or unpauses the game
+    /// 
+    /// Uses Unity's Time.timeScale to pause the entire game
+    /// This affects all time-based systems (animations, physics, etc.)
     /// </summary>
     public void TogglePause()
     {
         if (currentState == GameState.Playing)
         {
             currentState = GameState.Paused;
-            Time.timeScale = 0f;
+            Time.timeScale = 0f; // Pause the entire game
         }
         else if (currentState == GameState.Paused)
         {
             currentState = GameState.Playing;
-            Time.timeScale = 1f;
+            Time.timeScale = 1f; // Resume normal speed
         }
         
         OnGameStateChanged?.Invoke(currentState);
@@ -315,6 +368,12 @@ public class GameManager : MonoBehaviour
     
     /// <summary>
     /// Called when player clicks a good duck
+    /// 
+    /// This method:
+    /// 1. Adds points to the score
+    /// 2. Increments the good duck counter
+    /// 3. Updates the UI
+    /// 4. Checks if the level is complete
     /// </summary>
     public void OnGoodDuckClicked(GoodDuck duck)
     {
@@ -325,8 +384,6 @@ public class GameManager : MonoBehaviour
         
         OnScoreChanged?.Invoke(score);
         
-        Debug.Log($"Good duck clicked! Score: {score}, Progress: {goodDucksClicked}/{currentLevel.goodDucks}");
-        
         // Check win condition
         if (goodDucksClicked >= currentLevel.goodDucks)
         {
@@ -336,34 +393,34 @@ public class GameManager : MonoBehaviour
     
     /// <summary>
     /// Called when a good duck expires (player missed it)
+    /// 
+    /// Currently just tracks the statistic
+    /// Could be extended to add penalties or other mechanics
     /// </summary>
     public void OnGoodDuckMissed(GoodDuck duck)
     {
         if (currentState != GameState.Playing) return;
         
         goodDucksMissed++;
-        
-        Debug.Log($"Good duck missed! Total missed: {goodDucksMissed}");
-        
-        // Could implement penalty for missing ducks here
-        // For now, just track the statistic
     }
     
     /// <summary>
     /// Called when player clicks a decoy duck
+    /// 
+    /// This method:
+    /// 1. Applies a time penalty
+    /// 2. Updates the UI
+    /// 3. Checks if the penalty caused game over
     /// </summary>
     public void OnDecoyDuckClicked(DecoyDuck duck)
     {
         if (currentState != GameState.Playing) return;
         
-        // Apply time penalty from current level config
+        // Apply time penalty from level configuration
         timeLeft -= currentLevel.decoyPenalty;
-        
         OnTimeChanged?.Invoke(timeLeft);
         
-        Debug.Log($"Decoy clicked! Time penalty: -{currentLevel.decoyPenalty}s, Time left: {timeLeft:F1}s");
-        
-        // Check if time penalty caused game over
+        // Check if penalty caused game over
         if (timeLeft <= 0)
         {
             timeLeft = 0;
@@ -373,17 +430,20 @@ public class GameManager : MonoBehaviour
     
     /// <summary>
     /// Called when a decoy duck expires naturally
+    /// 
+    /// No penalty for decoys that expire naturally
+    /// Could be extended for additional mechanics
     /// </summary>
     public void OnDecoyDuckExpired(DecoyDuck duck)
     {
         if (currentState != GameState.Playing) return;
-        
-        Debug.Log("Decoy duck expired naturally - no penalty");
-        // No penalty for decoys that expire naturally
     }
     
     /// <summary>
-    /// Called when spawner creates a new duck
+    /// Called when a new duck is spawned
+    /// 
+    /// Tracks total ducks spawned for statistics
+    /// Could be used for difficulty scaling or achievements
     /// </summary>
     public void OnDuckSpawned()
     {
@@ -394,12 +454,20 @@ public class GameManager : MonoBehaviour
     
     #region Game Timer
     
+    /// <summary>
+    /// Updates the game timer every frame
+    /// 
+    /// This method:
+    /// 1. Decreases time remaining
+    /// 2. Updates the UI
+    /// 3. Checks if time ran out
+    /// </summary>
     private void UpdateGameTimer()
     {
         timeLeft -= Time.deltaTime;
         OnTimeChanged?.Invoke(timeLeft);
         
-        // Check time-based game over
+        // Check if time ran out
         if (timeLeft <= 0)
         {
             timeLeft = 0;
@@ -411,39 +479,50 @@ public class GameManager : MonoBehaviour
     
     #region Game Completion Handlers
     
+    /// <summary>
+    /// Handles level completion
+    /// 
+    /// Awards bonus points based on remaining time
+    /// 10 points per second remaining
+    /// </summary>
     private void HandleLevelComplete()
     {
-        Debug.Log($"Level {currentLevel.levelId} complete!");
-        
-        // Award bonus points for remaining time
         int timeBonus = Mathf.RoundToInt(timeLeft * 10);
         score += timeBonus;
         OnScoreChanged?.Invoke(score);
-        
-        Debug.Log($"Time bonus: {timeBonus} points");
     }
     
+    /// <summary>
+    /// Handles game over
+    /// 
+    /// Currently empty - could be extended for:
+    /// - Saving high scores
+    /// - Showing game over screen
+    /// - Playing game over sounds
+    /// </summary>
     private void HandleGameOver()
     {
-        Debug.Log($"Game Over! Single life lost - sudden death!");
-        
-        // Don't automatically restart - show game over screen instead
-        // The restart logic is handled in RestartLevel() when player clicks restart button
-        Debug.Log("Showing game over screen - player must click restart to continue");
+        // Could add game over logic here
     }
     
+    /// <summary>
+    /// Handles game completion (all levels finished)
+    /// 
+    /// Sets the game state to GameComplete
+    /// Notifies other systems of the completion
+    /// </summary>
     private void CompleteGame()
     {
         currentState = GameState.GameComplete;
         OnGameStateChanged?.Invoke(currentState);
-        
-        Debug.Log("Congratulations! All levels completed!");
     }
     
     #endregion
     
     #region Public Getters
     
+    // Properties that other systems can access to get game state
+    // These provide read-only access to private variables
     public int Score => score;
     public int Lives => lives;
     public float TimeLeft => timeLeft;
@@ -459,16 +538,23 @@ public class GameManager : MonoBehaviour
     #region Scene Management
     
     /// <summary>
-    /// Restart the entire game
+    /// Restarts the entire game by reloading the scene
+    /// 
+    /// This is a complete restart - all game state is reset
+    /// Useful for returning to a clean state
     /// </summary>
     public void RestartGame()
     {
-        Time.timeScale = 1f;
+        Time.timeScale = 1f; // Ensure game is not paused
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     
     /// <summary>
-    /// Quit the game
+    /// Quits the game
+    /// 
+    /// Works in both build and editor
+    /// In editor, stops play mode
+    /// In build, closes the application
     /// </summary>
     public void QuitGame()
     {
@@ -480,58 +566,25 @@ public class GameManager : MonoBehaviour
     }
     
     #endregion
-
-    /// <summary>
-    /// Debug method to test level loading and audio integration
-    /// </summary>
-    [ContextMenu("Test Level Loading")]
-    public void TestLevelLoading()
-    {
-        Debug.Log("=== Testing Level Loading ===");
-        
-        // Test loading each level and verify OnLevelLoaded fires
-        for (int i = 1; i <= 12; i++)
-        {
-            Debug.Log($"Testing level {i}...");
-            
-            // Temporarily change current level
-            int originalLevel = currentLevelId;
-            currentLevelId = i;
-            
-            // Load the level (this should trigger OnLevelLoaded)
-            LoadCurrentLevel();
-            
-            // Verify level data loaded correctly
-            if (currentLevel != null)
-            {
-                Debug.Log($"✅ Level {i} loaded: {currentLevel.levelName}");
-                Debug.Log($"   Background Music: {currentLevel.backgroundMusic}");
-                Debug.Log($"   Difficulty: {currentLevel.difficulty}");
-                Debug.Log($"   Special Mechanics: {string.Join(", ", currentLevel.specialMechanics)}");
-            }
-            else
-            {
-                Debug.LogError($"❌ Failed to load level {i}");
-            }
-            
-            // Restore original level
-            currentLevelId = originalLevel;
-        }
-        
-        // Restore original level data
-        LoadCurrentLevel();
-    }
 }
 
 /// <summary>
-/// Game state enumeration
+/// GameState enumeration - defines all possible states of the game
+/// 
+/// This creates a state machine that controls game flow:
+/// - Menu: Main menu/instructions screen
+/// - Playing: Active gameplay
+/// - Paused: Game is paused
+/// - LevelComplete: Level finished successfully
+/// - GameOver: Level failed
+/// - GameComplete: All levels completed
 /// </summary>
 public enum GameState
 {
-    Menu,
-    Playing,
-    Paused,
-    LevelComplete,
-    GameOver,
-    GameComplete
+    Menu,           // Main menu/instructions
+    Playing,        // Active gameplay
+    Paused,         // Game paused
+    LevelComplete,  // Level finished successfully
+    GameOver,       // Level failed
+    GameComplete    // All levels completed
 }
