@@ -12,6 +12,10 @@ public class LevelData
     public float duckLifetime;
     public int decoyPenalty;
     
+    // New fields for continuous spawning logic
+    public int maxTotalSpawns = 10;  // Maximum total good ducks that can spawn
+    public bool continueSpawning = true;  // Whether to continue spawning after initial good ducks
+    
     [System.Serializable]
     public class SizeDistribution
     {

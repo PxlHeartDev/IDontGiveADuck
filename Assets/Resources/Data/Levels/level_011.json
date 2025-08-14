@@ -3,6 +3,7 @@
   "levelName": "Maximum Pressure",
   "goodDucks": 21,
   "decoyDucks": 9,
+  "maxTotalSpawns": 33,
   "timeLimit": 40,
   "spawnRate": 1.0,
   "duckLifetime": 2.0,
@@ -15,9 +16,10 @@
   "specialMechanics": ["fast_movement", "overlapping_spawns"],
   "backgroundMusic": "boss_theme",
   "difficulty": "expert",
-  "designNotes": "Near-maximum difficulty - ultimate skill test with power-up mastery required",
+  "designNotes": "Near-maximum difficulty with 3 backup spawns for expert-level recovery.",
   "targetSuccessRate": 0.30,
   "learningObjective": "Push players to their mechanical and decision-making limits",
   "powerUpsAvailable": true,
+  "continueSpawning": true,
   "recommendedStrategy": "Strategic power-up timing essential - coordinate Slow-Time with overlapping spawns"
 }

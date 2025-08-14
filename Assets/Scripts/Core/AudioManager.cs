@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// AudioManager - Centralised audio system for the duck game
+/// AudioManager - Centralised audio system for the game
 /// 
 /// This class demonstrates several important game development concepts:
 /// - Singleton Pattern: Ensures only one audio manager exists

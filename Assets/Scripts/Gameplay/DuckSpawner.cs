@@ -147,7 +147,7 @@ public class DuckSpawner : MonoBehaviour
         
         spawnCoroutine = StartCoroutine(SpawnDucksCoroutine());
         
-        Debug.Log($"Started spawning for level {levelData.levelId}: {levelData.goodDucks} good, {levelData.decoyDucks} decoys");
+        Debug.Log($"Started spawning for level {levelData.levelId}: {levelData.goodDucks} good, {levelData.decoyDucks} decoys, maxTotalSpawns: {levelData.maxTotalSpawns}, continueSpawning: {levelData.continueSpawning}");
     }
     
     /// <summary>
@@ -192,35 +192,57 @@ public class DuckSpawner : MonoBehaviour
     /// </summary>
     private IEnumerator SpawnDucksCoroutine()
     {
-        while (isSpawning && (goodDucksRemaining > 0 || decoyDucksRemaining > 0))
+        while (isSpawning)
         {
+            // Check win condition only
+            if (GameManager.Instance != null)
+            {
+                // WIN: Player got required good ducks
+                if (GameManager.Instance.GoodDucksClicked >= currentLevel.goodDucks)
+                {
+                    Debug.Log("WIN: Player got required good ducks");
+                    break;
+                }
+                
+                // LOSE: Only when time runs out
+                if (GameManager.Instance.TimeLeft <= 0)
+                {
+                    Debug.Log("LOSE: Time ran out");
+                    break;
+                }
+            }
+            
             // Wait for spawn interval
             yield return new WaitForSeconds(currentLevel.spawnRate);
             
             // Decide what type of duck to spawn
             bool spawnGoodDuck = ShouldSpawnGoodDuck();
             
-            if (spawnGoodDuck && goodDucksRemaining > 0)
+            if (spawnGoodDuck)
             {
-                SpawnGoodDuck();
+                // Check if we can spawn more good ducks
+                if (GameManager.Instance != null && GameManager.Instance.TotalGoodDucksSpawned < currentLevel.maxTotalSpawns)
+                {
+                    SpawnGoodDuck();
+                }
+                else if (decoyDucksRemaining > 0)
+                {
+                    // Spawn decoy if we can't spawn more good ducks
+                    SpawnDecoyDuck();
+                }
             }
-            else if (!spawnGoodDuck && decoyDucksRemaining > 0)
+            else if (decoyDucksRemaining > 0)
             {
                 SpawnDecoyDuck();
             }
-            else if (goodDucksRemaining > 0)
+            else if (GameManager.Instance != null && GameManager.Instance.TotalGoodDucksSpawned < currentLevel.maxTotalSpawns)
             {
                 // Force spawn good duck if no decoys left
                 SpawnGoodDuck();
             }
-            else if (decoyDucksRemaining > 0)
-            {
-                // Force spawn decoy if no good ducks left
-                SpawnDecoyDuck();
-            }
         }
         
-        Debug.Log("Spawning completed - all ducks spawned");
+        Debug.Log($"Spawning completed - Total good ducks spawned: {GameManager.Instance?.TotalGoodDucksSpawned ?? 0}");
     }
     
     /// <summary>
@@ -228,12 +250,17 @@ public class DuckSpawner : MonoBehaviour
     /// </summary>
     private bool ShouldSpawnGoodDuck()
     {
-        if (goodDucksRemaining <= 0) return false;
+        // Check if we can spawn more good ducks
+        if (GameManager.Instance != null && GameManager.Instance.TotalGoodDucksSpawned >= currentLevel.maxTotalSpawns)
+        {
+            return false; // Can't spawn more good ducks
+        }
+        
         if (decoyDucksRemaining <= 0) return true;
         
-        // Calculate spawn probability based on remaining counts
-        float totalRemaining = goodDucksRemaining + decoyDucksRemaining;
-        float goodDuckProbability = goodDucksRemaining / totalRemaining;
+        // Calculate spawn probability based on remaining decoys and good duck spawns
+        float totalRemaining = decoyDucksRemaining + 1; // +1 for potential good duck
+        float goodDuckProbability = 1f / totalRemaining;
         
         // Add some randomness to avoid predictable patterns
         goodDuckProbability += Random.Range(-0.1f, 0.1f);
@@ -262,15 +289,15 @@ public class DuckSpawner : MonoBehaviour
         
         // Track active duck
         activeDucks.Add(duck);
-        goodDucksRemaining--;
         
         // Notify game manager
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnDuckSpawned();
+            GameManager.Instance.OnGoodDuckSpawned();
         }
         
-        Debug.Log($"Spawned good duck. Remaining: {goodDucksRemaining}");
+        Debug.Log($"Spawned good duck. Total spawned: {GameManager.Instance?.TotalGoodDucksSpawned ?? 0}");
     }
     
     /// <summary>

@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float timeLeft = 30f;      // Time remaining in current level
     [SerializeField] private int goodDucksClicked = 0;  // Number of good ducks clicked
     [SerializeField] private int goodDucksMissed = 0;   // Number of good ducks missed
+    [SerializeField] private int totalGoodDucksSpawned = 0; // Total good ducks spawned this level
     
     // Private state variables
     private LevelData currentLevel;                     // Data for the current level
@@ -139,6 +140,7 @@ public class GameManager : MonoBehaviour
         goodDucksClicked = 0;
         goodDucksMissed = 0;
         totalDucksSpawned = 0;
+        totalGoodDucksSpawned = 0;
         
         // Notify other systems (UI, Audio) about the new level
         OnLevelLoaded?.Invoke(currentLevel);
@@ -196,7 +198,6 @@ public class GameManager : MonoBehaviour
     {
         if (enableTestTools)
         {
-            Debug.Log($"Jumping to test level: {testLevelId}");
             JumpToLevel(testLevelId);
         }
         else
@@ -247,6 +248,7 @@ public class GameManager : MonoBehaviour
         goodDucksClicked = 0;
         goodDucksMissed = 0;
         totalDucksSpawned = 0;
+        totalGoodDucksSpawned = 0;
         levelStartTime = 0f;
         
         // Update UI with reset values
@@ -317,6 +319,16 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void EndGame(bool won)
     {
+        // Handle the result first (including time bonus calculation)
+        if (won)
+        {
+            HandleLevelComplete();
+        }
+        else
+        {
+            HandleGameOver();
+        }
+        
         currentState = won ? GameState.LevelComplete : GameState.GameOver;
         
         // Stop spawning ducks
@@ -326,18 +338,8 @@ public class GameManager : MonoBehaviour
             spawner.StopSpawning();
         }
         
-        // Notify other systems of state change
+        // Notify other systems of state change (with final score already calculated)
         OnGameStateChanged?.Invoke(currentState);
-        
-        // Handle the result
-        if (won)
-        {
-            HandleLevelComplete();
-        }
-        else
-        {
-            HandleGameOver();
-        }
     }
     
     /// <summary>
@@ -384,7 +386,7 @@ public class GameManager : MonoBehaviour
         
         OnScoreChanged?.Invoke(score);
         
-        // Check win condition
+        // Check win condition - player got required good ducks
         if (goodDucksClicked >= currentLevel.goodDucks)
         {
             EndGame(true);
@@ -450,6 +452,16 @@ public class GameManager : MonoBehaviour
         totalDucksSpawned++;
     }
     
+    /// <summary>
+    /// Called when a good duck is spawned
+    /// 
+    /// Tracks total good ducks spawned
+    /// </summary>
+    public void OnGoodDuckSpawned()
+    {
+        totalGoodDucksSpawned++;
+    }
+    
     #endregion
     
     #region Game Timer
@@ -489,6 +501,7 @@ public class GameManager : MonoBehaviour
     {
         int timeBonus = Mathf.RoundToInt(timeLeft * 10);
         score += timeBonus;
+        
         OnScoreChanged?.Invoke(score);
     }
     
@@ -531,6 +544,8 @@ public class GameManager : MonoBehaviour
     public int CurrentLevelId => currentLevelId;
     public int GoodDucksClicked => goodDucksClicked;
     public int GoodDucksRequired => currentLevel?.goodDucks ?? 0;
+    public int TotalGoodDucksSpawned => totalGoodDucksSpawned;
+    public int MaxTotalSpawns => currentLevel?.maxTotalSpawns ?? 10;
     public float LevelProgress => currentLevel != null ? (float)goodDucksClicked / currentLevel.goodDucks : 0f;
     
     #endregion

@@ -3,6 +3,7 @@
   "levelName": "The Jump",
   "goodDucks": 13,
   "decoyDucks": 5,
+  "maxTotalSpawns": 21,
   "timeLimit": 30,
   "spawnRate": 1.4,
   "duckLifetime": 2.8,
@@ -15,8 +16,9 @@
   "specialMechanics": [],
   "backgroundMusic": "challenge_theme",
   "difficulty": "medium",
-  "designNotes": "Significant difficulty spike - test player adaptation within standard timeframe",
+  "designNotes": "Significant difficulty spike with 3 backup spawns for adaptation testing.",
   "targetSuccessRate": 0.55,
   "learningObjective": "Create noticeable difficulty spike that challenges but doesn't break players",
-  "powerUpsAvailable": false
+  "powerUpsAvailable": false,
+  "continueSpawning": true
 }

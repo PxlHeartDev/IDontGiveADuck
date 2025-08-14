@@ -32,6 +32,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button startGameButton;
     [SerializeField] private Button testLevel12Button;
     
+    [Header("Testing Tools")]
+    [SerializeField] private bool showTestButton = true;     // Show/hide test button
+    [SerializeField] private int testButtonLevel = 12;       // Level to jump to when test button is clicked
+    
     [Header("Settings")]
     [SerializeField] private bool showDebugInfo = true;
     [SerializeField] private Color timerWarningColor = Color.red;
@@ -93,7 +97,7 @@ public class UIManager : MonoBehaviour
         if (startGameButton != null)
             startGameButton.onClick.AddListener(OnStartGameClicked);
         if (testLevel12Button != null)
-            testLevel12Button.onClick.AddListener(OnTestLevel12Clicked);
+            testLevel12Button.onClick.AddListener(OnTestLevelClicked);
     }
     
     #endregion
@@ -323,13 +327,22 @@ public class UIManager : MonoBehaviour
         GameManager.Instance?.TogglePause();
     }
     
-    private void OnTestLevel12Clicked()
+    private void OnTestLevelClicked()
     {
+        if (!showTestButton)
+        {
+            Debug.LogWarning("Test button is disabled. Enable 'showTestButton' to use this feature.");
+            return;
+        }
+        
         if (instructionsPanel != null)
             instructionsPanel.SetActive(false);
         
         if (GameManager.Instance != null)
-            GameManager.Instance.JumpToLevel(12);
+        {
+            Debug.Log($"Test button clicked - jumping to level {testButtonLevel}");
+            GameManager.Instance.JumpToLevel(testButtonLevel);
+        }
     }
     
     #endregion
@@ -360,11 +373,12 @@ public class UIManager : MonoBehaviour
     {
         if (!showDebugInfo || GameManager.Instance == null) return;
         
-        GUILayout.BeginArea(new Rect(Screen.width - 200, 10, 190, 150));
+        GUILayout.BeginArea(new Rect(Screen.width - 200, 10, 190, 180));
         GUILayout.Label("=== DEBUG INFO ===");
         GUILayout.Label($"State: {GameManager.Instance.CurrentState}");
         GUILayout.Label($"Level: {GameManager.Instance.CurrentLevelId}");
         GUILayout.Label($"Ducks: {GameManager.Instance.GoodDucksClicked}/{GameManager.Instance.GoodDucksRequired}");
+        GUILayout.Label($"Spawns: {GameManager.Instance.TotalGoodDucksSpawned}/{GameManager.Instance.MaxTotalSpawns}");
         GUILayout.Label($"Time: {GameManager.Instance.TimeLeft:F1}s");
         GUILayout.Label($"Lives: {GameManager.Instance.Lives}");
         

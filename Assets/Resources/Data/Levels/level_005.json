@@ -3,6 +3,7 @@
   "levelName": "Pattern Practice",
   "goodDucks": 9,
   "decoyDucks": 3,
+  "maxTotalSpawns": 15,
   "timeLimit": 25,
   "spawnRate": 1.8,
   "duckLifetime": 3.2,
@@ -15,8 +16,9 @@
   "specialMechanics": ["predictable_sequence"],
   "backgroundMusic": "action_theme",
   "difficulty": "easy",
-  "designNotes": "Highest efficiency in tutorial tier - predictable patterns help offset intensity",
+  "designNotes": "Predictable patterns help offset intensity. 3 backup spawns for pattern learning.",
   "targetSuccessRate": 0.70,
   "learningObjective": "Show how predictability can offset increased difficulty",
-  "powerUpsAvailable": false
+  "powerUpsAvailable": false,
+  "continueSpawning": true
 }

@@ -3,6 +3,7 @@
   "levelName": "Duck Hunt",
   "goodDucks": 15,
   "decoyDucks": 6,
+  "maxTotalSpawns": 24,
   "timeLimit": 35,
   "spawnRate": 1.3,
   "duckLifetime": 2.5,
@@ -15,8 +16,9 @@
   "specialMechanics": ["slow_movement"],
   "backgroundMusic": "challenge_theme",
   "difficulty": "medium",
-  "designNotes": "Extended time prepares for power-up introduction - moving mechanics with breathing room",
+  "designNotes": "Moving mechanics introduction with 3 backup spawns for learning curve.",
   "targetSuccessRate": 0.50,
   "learningObjective": "Introduce movement mechanics without overwhelming players",
-  "powerUpsAvailable": false
+  "powerUpsAvailable": false,
+  "continueSpawning": true
 }

@@ -3,6 +3,7 @@
   "levelName": "Speed Increase",
   "goodDucks": 7,
   "decoyDucks": 2,
+  "maxTotalSpawns": 12,
   "timeLimit": 25,
   "spawnRate": 2.0,
   "duckLifetime": 3.5,
@@ -15,8 +16,9 @@
   "specialMechanics": [],
   "backgroundMusic": "action_theme",
   "difficulty": "easy",
-  "designNotes": "Multi-parameter scaling demo - speed AND count increase in short timeframe",
+  "designNotes": "Multi-parameter scaling with 3 backup spawns for skill transition.",
   "targetSuccessRate": 0.75,
   "learningObjective": "Demonstrate how multiple parameters create progression",
-  "powerUpsAvailable": false
+  "powerUpsAvailable": false,
+  "continueSpawning": true
 }

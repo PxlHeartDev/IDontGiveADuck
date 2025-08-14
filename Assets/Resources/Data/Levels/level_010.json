@@ -3,6 +3,7 @@
   "levelName": "Expert Entry",
   "goodDucks": 19,
   "decoyDucks": 8,
+  "maxTotalSpawns": 30,
   "timeLimit": 40,
   "spawnRate": 1.1,
   "duckLifetime": 2.1,
@@ -15,9 +16,10 @@
   "specialMechanics": ["slow_movement", "overlapping_spawns"],
   "backgroundMusic": "boss_theme",
   "difficulty": "hard",
-  "designNotes": "Epic 40-second battle - skill gate requiring power-up strategy",
+  "designNotes": "Epic 40-second battle with 3 backup spawns for strategic recovery.",
   "targetSuccessRate": 0.35,
   "learningObjective": "Create clear skill gate that filters player progression",
   "powerUpsAvailable": true,
+  "continueSpawning": true,
   "recommendedStrategy": "Use Time Boost early, save Slow-Time for final 10 seconds"
 }

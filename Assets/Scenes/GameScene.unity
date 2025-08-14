@@ -418,6 +418,8 @@ MonoBehaviour:
   instructionsPanel: {fileID: 1061021105}
   startGameButton: {fileID: 427323595}
   testLevel12Button: {fileID: 84889}
+  showTestButton: 1
+  testButtonLevel: 5
   showDebugInfo: 1
   timerWarningColor: {r: 1, g: 0, b: 0, a: 1}
   timerWarningThreshold: 10
@@ -3114,7 +3116,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Test Level 12
+  m_text: Test Level
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3381,13 +3383,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2469f51734140c4e859e9a4c2097105, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingLives: 3
+  startingLives: 1
   currentLevelId: 1
+  testLevelId: 12
+  enableTestTools: 1
   score: 0
-  lives: 3
+  lives: 1
   timeLeft: 30
   goodDucksClicked: 0
   goodDucksMissed: 0
+  totalGoodDucksSpawned: 0
 --- !u!4 &1909912757
 Transform:
   m_ObjectHideFlags: 0
