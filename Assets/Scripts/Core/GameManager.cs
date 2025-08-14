@@ -135,6 +135,32 @@ public class GameManager : MonoBehaviour
     }
     
     /// <summary>
+    /// Jump directly to a specific level (for testing)
+    /// </summary>
+    public void JumpToLevel(int levelId)
+    {
+        Debug.Log($"GameManager.JumpToLevel({levelId}) called");
+        
+        // Stop any existing spawner first
+        DuckSpawner spawner = FindFirstObjectByType<DuckSpawner>();
+        if (spawner != null)
+        {
+            spawner.StopSpawning();
+        }
+        
+        // Set the target level
+        currentLevelId = levelId;
+        
+        // Load the level
+        LoadCurrentLevel();
+        
+        // Start the game immediately
+        StartGame(false);
+        
+        Debug.Log($"Jumped to level {levelId}: {currentLevel?.levelName}");
+    }
+    
+    /// <summary>
     /// Restart from the latest checkpoint or current level if no checkpoint
     /// </summary>
     public void RestartLevel()

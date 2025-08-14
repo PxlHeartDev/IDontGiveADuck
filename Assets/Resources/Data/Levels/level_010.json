@@ -13,7 +13,7 @@
     "small": 0.25
   },
   "specialMechanics": ["slow_movement", "overlapping_spawns"],
-  "backgroundMusic": "expert_theme",
+  "backgroundMusic": "boss_theme",
   "difficulty": "hard",
   "designNotes": "Epic 40-second battle - skill gate requiring power-up strategy",
   "targetSuccessRate": 0.35,

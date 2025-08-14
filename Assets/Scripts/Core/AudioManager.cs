@@ -33,8 +33,8 @@ public class AudioManager : MonoBehaviour
     
     [Header("Volume Settings")]
     [Range(0f, 1f)] public float masterVolume = 1f;
-    [Range(0f, 1f)] public float musicVolume = 0.2f;  // Much lower music volume
-    [Range(0f, 1f)] public float sfxVolume = 1f;      // Higher SFX volume
+    [Range(0f, 1f)] public float musicVolume = 0.5f;
+    [Range(0f, 1f)] public float sfxVolume = 1f;
     
     // Current music tracking
     private AudioClip currentMusic;
@@ -43,7 +43,6 @@ public class AudioManager : MonoBehaviour
     
     void Awake()
     {
-        // Singleton pattern
         if (Instance == null)
         {
             Instance = this;
@@ -58,20 +57,17 @@ public class AudioManager : MonoBehaviour
     
     void Start()
     {
-        // Subscribe to game events
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnGameStateChanged += OnGameStateChanged;
             GameManager.Instance.OnLevelLoaded += OnLevelLoaded;
         }
         
-        // Start with menu music
         PlayMusic(menuMusic);
     }
     
     void OnDestroy()
     {
-        // Unsubscribe from events
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnGameStateChanged -= OnGameStateChanged;
@@ -85,7 +81,6 @@ public class AudioManager : MonoBehaviour
     
     private void InitializeAudioManager()
     {
-        // Create audio sources if not assigned
         if (musicSource == null)
         {
             GameObject musicObj = new GameObject("MusicSource");
@@ -103,7 +98,6 @@ public class AudioManager : MonoBehaviour
             sfxSource.playOnAwake = false;
         }
         
-        // Apply initial volume settings
         UpdateVolumeSettings();
     }
     
@@ -111,9 +105,6 @@ public class AudioManager : MonoBehaviour
     
     #region Music Control
     
-    /// <summary>
-    /// Play background music
-    /// </summary>
     public void PlayMusic(AudioClip music)
     {
         if (music == null || musicSource == null) return;
@@ -125,9 +116,6 @@ public class AudioManager : MonoBehaviour
         musicSource.Play();
     }
     
-    /// <summary>
-    /// Stop music
-    /// </summary>
     public void StopMusic()
     {
         if (musicSource != null)
@@ -141,22 +129,18 @@ public class AudioManager : MonoBehaviour
     
     #region Sound Effects
     
-    /// <summary>
-    /// Play sound effect at a specific world position
-    /// </summary>
     public void PlaySFXAtPosition(AudioClip clip, Vector3 position)
     {
-        if (clip == null) return;
-        // Increase volume for duck sounds to make them more prominent
-        float duckVolumeMultiplier = 10.0f; // 10x louder than regular SFX
+        if (clip == null || sfxSource == null) return;
+        
+        float duckVolumeMultiplier = 20.0f;
         float finalVolume = sfxVolume * masterVolume * duckVolumeMultiplier;
-        Debug.Log($"PlaySFXAtPosition: clip={clip.name}, volume={finalVolume}, sfxVolume={sfxVolume}, masterVolume={masterVolume}");
-        AudioSource.PlayClipAtPoint(clip, position, finalVolume);
+        
+        sfxSource.clip = clip;
+        sfxSource.volume = finalVolume;
+        sfxSource.Play();
     }
     
-    /// <summary>
-    /// Play UI sound effect
-    /// </summary>
     public void PlayUISFX(AudioClip clip)
     {
         if (clip == null || sfxSource == null) return;
@@ -170,9 +154,6 @@ public class AudioManager : MonoBehaviour
     
     #region Game-Specific Audio Events
     
-    /// <summary>
-    /// Handle game state changes for automatic music
-    /// </summary>
     private void OnGameStateChanged(GameState newState)
     {
         switch (newState)
@@ -194,12 +175,8 @@ public class AudioManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Handle level loading for level-specific music
-    /// </summary>
     private void OnLevelLoaded(LevelData levelData)
     {
-        // Don't change music if we're in menu state
         if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Menu)
         {
             return;
@@ -214,20 +191,20 @@ public class AudioManager : MonoBehaviour
             }
             else
             {
-                PlayMusic(tutorialTheme); // Fallback
+                PlayMusic(tutorialTheme);
             }
         }
         else
         {
-            PlayMusic(tutorialTheme); // Fallback
+            PlayMusic(tutorialTheme);
         }
     }
     
-    /// <summary>
-    /// Get the appropriate music clip based on the backgroundMusic field
-    /// </summary>
     private AudioClip GetLevelMusic(string musicName)
     {
+        if (string.IsNullOrEmpty(musicName))
+            return null;
+            
         switch (musicName.ToLower())
         {
             case "tutorial_theme":
@@ -243,43 +220,26 @@ public class AudioManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Duck click sounds
-    /// </summary>
     public void PlayDuckClickDecoy(Vector3 position)
     {
-        Debug.Log("PlayDuckClickDecoy called");
-        if (duckClickDecoySound == null)
+        if (duckClickDecoySound != null)
         {
-            Debug.LogError("duckClickDecoySound is NULL! Assign it in the Inspector.");
-            return;
+            PlaySFXAtPosition(duckClickDecoySound, position);
         }
-        Debug.Log($"Playing decoy sound: {duckClickDecoySound.name}");
-        PlaySFXAtPosition(duckClickDecoySound, position);
     }
     
-    /// <summary>
-    /// Duck click good sound
-    /// </summary>
     public void PlayDuckClickGood(Vector3 position)
     {
-        Debug.Log("PlayDuckClickGood called");
-        if (duckClickGoodSound == null)
+        if (duckClickGoodSound != null)
         {
-            Debug.LogError("duckClickGoodSound is NULL! Assign it in the Inspector.");
-            return;
+            PlaySFXAtPosition(duckClickGoodSound, position);
         }
-        Debug.Log($"Playing good duck sound: {duckClickGoodSound.name}");
-        PlaySFXAtPosition(duckClickGoodSound, position);
     }
     
     #endregion
     
     #region Volume Control
     
-    /// <summary>
-    /// Update all volume settings
-    /// </summary>
     public void UpdateVolumeSettings()
     {
         if (musicSource != null)
@@ -289,27 +249,18 @@ public class AudioManager : MonoBehaviour
             sfxSource.volume = sfxVolume * masterVolume;
     }
     
-    /// <summary>
-    /// Set master volume
-    /// </summary>
     public void SetMasterVolume(float volume)
     {
         masterVolume = Mathf.Clamp01(volume);
         UpdateVolumeSettings();
     }
     
-    /// <summary>
-    /// Set music volume
-    /// </summary>
     public void SetMusicVolume(float volume)
     {
         musicVolume = Mathf.Clamp01(volume);
         UpdateVolumeSettings();
     }
     
-    /// <summary>
-    /// Set SFX volume
-    /// </summary>
     public void SetSFXVolume(float volume)
     {
         sfxVolume = Mathf.Clamp01(volume);

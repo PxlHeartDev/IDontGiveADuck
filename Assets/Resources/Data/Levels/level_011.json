@@ -13,7 +13,7 @@
     "small": 0.30
   },
   "specialMechanics": ["fast_movement", "overlapping_spawns"],
-  "backgroundMusic": "expert_theme",
+  "backgroundMusic": "boss_theme",
   "difficulty": "expert",
   "designNotes": "Near-maximum difficulty - ultimate skill test with power-up mastery required",
   "targetSuccessRate": 0.30,
