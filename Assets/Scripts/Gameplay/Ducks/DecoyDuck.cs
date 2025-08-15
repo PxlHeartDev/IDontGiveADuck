@@ -84,14 +84,22 @@ public class DecoyDuck : BaseDuck
     {
         base.HandleMovement();
         
+        // NOTE: This movement code is currently not active!
+        // The base BaseDuck class has moveSpeed = 0f by default
+        // To see this movement in action, you would need to:
+        // 1. Set moveSpeed > 0 in the Inspector, OR
+        // 2. Override the moveSpeed property in this DecoyDuck class
+        
         // Decoy ducks could have slightly different movement patterns
-        // This could help players learn to distinguish them
+        // This could help players learn to distinguish them from good ducks
         if (moveSpeed > 0)
         {
-            // Example: Decoy ducks move in a slightly different pattern
+            // Example: Decoy ducks move in a slightly different pattern (subtle wiggle)
+            // This creates a small horizontal oscillation that observant players might notice
             float wiggle = Mathf.Sin(Time.time * 2f) * 0.1f;
             transform.position += Vector3.right * wiggle * Time.deltaTime;
         }
+        // If moveSpeed is 0 (default), this duck won't move at all
     }
     
     #endregion

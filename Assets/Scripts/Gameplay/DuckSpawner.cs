@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// - Random Generation: Creating varied spawn patterns
 /// - Event-Driven Architecture: Notifying other systems of spawn events
 /// - Level-Based Configuration: Adapting spawn behavior to different levels
-/// - Debug Visualization: Using Gizmos to show spawn areas in the editor
+/// - Debug Visualisation: Using Gizmos to show spawn areas in the editor
 /// </summary>
 public class DuckSpawner : MonoBehaviour
 {
@@ -31,10 +31,10 @@ public class DuckSpawner : MonoBehaviour
     [SerializeField] private float spawnPadding = 1f;  // Distance from spawn area edges (prevents ducks spawning too close to borders)
     
     // ===== DEBUG SETTINGS =====
-    // These help during development by visualizing spawn areas
+    // These help during development by visualising spawn areas
     
     [Header("Debug Settings")]
-    [SerializeField] private bool showSpawnArea = true;     // Toggle spawn area visualization
+    [SerializeField] private bool showSpawnArea = true;     // Toggle spawn area visualisation
     [SerializeField] private Color spawnAreaColor = Color.green;  // Colour of spawn area in scene view
     
     // ===== RUNTIME STATE =====
@@ -61,7 +61,7 @@ public class DuckSpawner : MonoBehaviour
     
     /// <summary>
     /// Called when the script instance is being loaded
-    /// This happens before Start() and is used for initialization
+    /// This happens before Start() and is used for initialisation
     /// </summary>
     void Awake()
     {
@@ -77,7 +77,7 @@ public class DuckSpawner : MonoBehaviour
     
     /// <summary>
     /// Called by Unity's Gizmo system to draw debug information in the Scene view
-    /// This helps visualize the spawn area during development
+    /// This helps visualise the spawn area during development
     /// </summary>
     void OnDrawGizmos()
     {

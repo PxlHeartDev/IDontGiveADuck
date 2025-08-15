@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 using TMPro;
 
 /// <summary>
-/// UIManager - Centralized UI system for the game
+/// UIManager - Centralised UI system for the game
 /// 
 /// This class demonstrates several important game development concepts:
 /// - Event-Driven UI Updates: UI automatically updates when game state changes
@@ -53,22 +53,22 @@ public class UIManager : MonoBehaviour
     
     [Header("Settings")]
     [SerializeField] private bool showDebugInfo = true;      // Toggle to show debug information on screen
-    [SerializeField] private Color timerWarningColor = Color.red;  // Color when time is running low
+    [SerializeField] private Color timerWarningColor = Color.red;  // Colour when time is running low
     [SerializeField] private float timerWarningThreshold = 10f;    // Time remaining when warning starts
     
     // ===== PRIVATE VARIABLES =====
-    private Color originalTimerColor;  // Stores the original timer color to restore it later
+    private Color originalTimerColor;  // Stores the original timer colour to restore it later
     
     #region Unity Lifecycle
     // Unity automatically calls these methods at specific times during the game's lifecycle
     
     /// <summary>
     /// Called when the script instance is being loaded
-    /// This happens before Start() and is used for initialization
+    /// This happens before Start() and is used for initialisation
     /// </summary>
     void Awake()
     {
-        // Store the original timer color so we can restore it later
+        // Store the original timer colour so we can restore it later
         if (timerText != null)
             originalTimerColor = timerText.color;
         
@@ -159,8 +159,8 @@ public class UIManager : MonoBehaviour
     }
     
     /// <summary>
-    /// Updates the timer display and changes color when time is running low
-    /// Converts seconds to minutes:seconds format and shows warning color
+    /// Updates the timer display and changes colour when time is running low
+    /// Converts seconds to minutes:seconds format and shows warning colour
     /// </summary>
     public void UpdateTimer(float timeLeft)
     {
@@ -171,9 +171,9 @@ public class UIManager : MonoBehaviour
             int seconds = Mathf.FloorToInt(timeLeft % 60);  // % is modulo operator (remainder after division)
             timerText.text = $"Time: {minutes:00}:{seconds:00}";  // :00 format ensures 2 digits
             
-            // Change color to red when time is running low
+            // Change colour to red when time is running low
             if (timeLeft <= timerWarningThreshold)
-                // Lerp smoothly transitions between colors based on remaining time
+                // Lerp smoothly transitions between colours based on remaining time
                 timerText.color = Color.Lerp(timerWarningColor, originalTimerColor, timeLeft / timerWarningThreshold);
             else
                 timerText.color = originalTimerColor;

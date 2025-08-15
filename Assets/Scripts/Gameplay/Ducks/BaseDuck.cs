@@ -60,15 +60,32 @@ public abstract class BaseDuck : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Called every frame by Unity - this is where we handle all duck behaviour
+    /// 
+    /// Update() is one of Unity's most important methods:
+    /// - Called once per frame (typically 60 times per second)
+    /// - Used for continuous updates like movement, timers, input
+    /// - Should be efficient since it runs so frequently
+    /// </summary>
     protected virtual void Update()
     {
+        // Safety check: Don't do anything if duck isn't properly set up yet
+        // This prevents errors during the brief moment between object creation and initialization
         if (!isInitialized) return;
         
+        // Handle duck lifetime countdown and expiration
+        // This makes ducks disappear after their time is up
         HandleLifetime();
+        
+        // Handle duck movement (if any)
+        // Currently not implemented but ready for future moving ducks
         HandleMovement();
+        
+        // Check if player has clicked on this duck
+        // Uses Unity's new Input System for better input handling
         HandleClickDetection();
     }
-    
     /// <summary>
     /// Handle mouse click detection using new Input System
     /// </summary>
