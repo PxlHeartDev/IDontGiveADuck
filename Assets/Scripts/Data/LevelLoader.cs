@@ -38,7 +38,7 @@ public class LevelLoader : MonoBehaviour
     /// Loads a level by its ID number
     /// 
     /// Process:
-    /// 1. Check if level is already cached (performance optimization)
+    /// 1. Check if level is already cached (performance optimisation)
     /// 2. If not cached, load from JSON file in Resources folder
     /// 3. Parse JSON into LevelData object
     /// 4. Cache the result for future use
@@ -53,6 +53,8 @@ public class LevelLoader : MonoBehaviour
         }
         
         // Create filename with zero-padding (e.g., "level_001", "level_012")
+        // The :D3 format specifier ensures the level ID is always 3 digits with leading zeros
+        // This creates consistent filenames that sort correctly in file systems
         string fileName = $"level_{levelId:D3}";
         
         // Load JSON file from Unity's Resources system

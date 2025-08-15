@@ -90,7 +90,7 @@ public class AudioManager : MonoBehaviour
     
     #endregion
     
-    #region Initialization
+    #region Initialisation
     
     /// <summary>
     /// Sets up the audio system with proper AudioSource components
