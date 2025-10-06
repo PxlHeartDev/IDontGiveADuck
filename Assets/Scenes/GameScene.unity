@@ -569,7 +569,7 @@ GameObject:
   m_Component:
   - component: {fileID: 88627197}
   - component: {fileID: 88627196}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: SpawnArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -605,7 +605,7 @@ BoxCollider2D:
     m_Bits: 4294967295
   m_CallbackLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
@@ -631,8 +631,8 @@ Transform:
   m_GameObject: {fileID: 88627195}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.008726465, z: 0, w: 0.999962}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.1709, y: 1.1709, z: 1.1709}
+  m_LocalPosition: {x: 0, y: 0.3, z: 0}
+  m_LocalScale: {x: 1.4, y: 1.57, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -3656,7 +3656,7 @@ MonoBehaviour:
   - {fileID: 2979584664770396576, guid: 0b4e3570a8f1b254187947b603afcf94, type: 3}
   - {fileID: 2979584664770396576, guid: 5faca6bce2f73cd49b211b428860d857, type: 3}
   - {fileID: 2979584664770396576, guid: dc9deb93d1aaeb34ebf220579d1bbd4d, type: 3}
-  spawnArea: {fileID: 0}
+  spawnArea: {fileID: 88627196}
   spawnPadding: 1
   showSpawnArea: 1
   spawnAreaColor: {r: 0, g: 1, b: 0, a: 1}
