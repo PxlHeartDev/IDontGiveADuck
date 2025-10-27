@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e5a26991747fd2541b3e3f4f0a85a73d
+guid: d91e5424618a9fb498a65055133f6298
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6358040702757662528
-    second: Yellow_0
+      213: 2971222547826678600
+    second: equipped_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Yellow_0
+      name: equipped_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 16
-        height: 16
+        x: 2
+        y: 2
+        width: 28
+        height: 28
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 04f6853355c4c3850800000000000000
-      internalID: 6358040702757662528
+      spriteID: 84b17df3a27eb3920800000000000000
+      internalID: 2971222547826678600
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 561fce5318bd2014597fa2c5bc121653
+    spriteID: 8a9aa9f4572af624baaab97df6a14696
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Yellow_0: 6358040702757662528
+      equipped_0: 2971222547826678600
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
