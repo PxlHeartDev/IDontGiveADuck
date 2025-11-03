@@ -67,7 +67,7 @@ public class LevelLoader : MonoBehaviour
             {
                 // Convert JSON text to LevelData object
                 LevelData levelData = JsonUtility.FromJson<LevelData>(levelFile.text);
-                
+
                 // Store in cache for future use
                 levelCache[levelId] = levelData;
                 return levelData;
@@ -85,6 +85,7 @@ public class LevelLoader : MonoBehaviour
             Debug.LogWarning($"Level file not found: {fileName}");
             return CreateDefaultLevel(levelId);
         }
+
     }
     
     /// <summary>

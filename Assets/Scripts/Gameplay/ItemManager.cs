@@ -23,24 +23,16 @@ public class ItemManager : MonoBehaviour
 
     private void Start()
     {
+        GameManager.Instance.AnyLevelLoaded += LevelLoaded;
+
         blueButton.onClick.AddListener(BlueButtonPressed);
         redButton.onClick.AddListener(RedButtonPressed);
         yellowButton.onClick.AddListener(YellowButtonPressed);
     }
 
-    void Update()
+    private void OnDestroy()
     {
-        
-    }
-
-    private void OnEnable()
-    {
-        GameManager.Instance.OnLevelLoaded += LevelLoaded;
-    }
-
-    private void OnDisable()
-    {
-        GameManager.Instance.OnLevelLoaded -= LevelLoaded;
+        GameManager.Instance.AnyLevelLoaded -= LevelLoaded;
     }
 
     void LevelLoaded(LevelData level)
@@ -55,7 +47,7 @@ public class ItemManager : MonoBehaviour
     }
 
     void UpdateButtons(bool blue, bool red, bool yellow)
-    {
+    {  
         blueButton.gameObject.SetActive(blue);
         redButton.gameObject.SetActive(red);
         yellowButton.gameObject.SetActive(yellow);

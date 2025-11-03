@@ -48,10 +48,11 @@ public class GameManager : MonoBehaviour
     public System.Action<int> OnLivesChanged;           // Fired when lives change
     public System.Action<float> OnTimeChanged;          // Fired when time changes
     public System.Action<GameState> OnGameStateChanged; // Fired when game state changes
-    public System.Action<LevelData> OnLevelLoaded;      // Fired when a new level is loaded
-    
+    public System.Action<LevelData> OnLevelLoaded;      // Fired when the first level is loaded
+    public System.Action<LevelData> AnyLevelLoaded;     // Fired when a new level is loaded
+
     #region Unity Lifecycle
-    
+
     /// <summary>
     /// Called when the GameObject is created
     /// Sets up the singleton pattern and initialises the game
@@ -263,11 +264,16 @@ public class GameManager : MonoBehaviour
         currentState = GameState.Menu;
         OnGameStateChanged?.Invoke(currentState);
     }
-    
+
     #endregion
-    
+
     #region Game Flow Control
-    
+
+    public void StartGameFromMenu()
+    {
+        StartGame(true);
+    }
+
     /// <summary>
     /// Starts the current level
     /// 
@@ -289,10 +295,8 @@ public class GameManager : MonoBehaviour
         
         // Only trigger level load event if coming from menu
         // (prevents duplicate audio/music changes when advancing levels)
-        if (fromMenu)
-        {
-            OnLevelLoaded?.Invoke(currentLevel);
-        }
+        if (fromMenu) OnLevelLoaded?.Invoke(currentLevel);
+        AnyLevelLoaded?.Invoke(currentLevel);
         
         levelStartTime = Time.time;
         
