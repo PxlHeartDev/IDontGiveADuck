@@ -11,7 +11,10 @@ public abstract class BaseDuck : MonoBehaviour
     [SerializeField] protected int pointValue = 1;
     [SerializeField] protected float lifetime = 5f;
     [SerializeField] protected float moveSpeed = 0f; // For future moving ducks
-    
+
+    public ItemManager.Berry favouriteBerry = ItemManager.Berry.Blue;
+    protected float destroyDelay;
+
     [Header("Visual Feedback")]
     [SerializeField] protected ParticleSystem destroyEffect;
     [SerializeField] protected AudioClip clickSound;
@@ -24,7 +27,7 @@ public abstract class BaseDuck : MonoBehaviour
     // Public properties for external access
     public int PointValue => pointValue;
     public bool IsClicked => isClicked;
-    
+
     #region Unity Lifecycle
     
     protected virtual void Start()
@@ -136,7 +139,10 @@ public abstract class BaseDuck : MonoBehaviour
     {
         currentLifetime = customLifetime > 0 ? customLifetime : lifetime;
         if (customPointValue > 0) pointValue = customPointValue;
-        
+
+        ItemManager.Berry[] berriesAvailable = GameManager.Instance.CurrentLevel.berriesAvailable;
+        if (berriesAvailable.Length > 0) favouriteBerry = berriesAvailable[Random.Range(0, berriesAvailable.Length)];
+
         isInitialized = true;
         OnDuckSpawned();
     }
@@ -193,8 +199,10 @@ public abstract class BaseDuck : MonoBehaviour
             AudioSource.PlayClipAtPoint(clickSound, transform.position);
         }
         
+        GetComponent<SpriteRenderer>().enabled = false;
+
         // Remove duck from scene
-        Destroy(gameObject);
+        Destroy(gameObject, destroyDelay);
     }
     
     #endregion
@@ -221,7 +229,7 @@ public abstract class BaseDuck : MonoBehaviour
     protected virtual void OnDuckSpawned()
     {
         // Default implementation - can be overridden
-        Debug.Log($"{GetType().Name} spawned at position {transform.position} with {currentLifetime}s lifetime");
+        Debug.Log($"{GetType().Name} spawned at position {transform.position} with {currentLifetime}s lifetime and fav berry {favouriteBerry}");
     }
     
     /// <summary>

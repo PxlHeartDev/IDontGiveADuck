@@ -20,5 +20,6 @@
   "targetSuccessRate": 0.50,
   "learningObjective": "Introduce movement mechanics without overwhelming players",
   "powerUpsAvailable": false,
-  "continueSpawning": true
+  "continueSpawning": true,
+  "berriesAvailable": [0, 1, 2]
 }

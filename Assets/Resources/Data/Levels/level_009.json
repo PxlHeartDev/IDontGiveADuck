@@ -25,5 +25,6 @@
     "timeBoost": "Adds 5 seconds to timer - use when running low on time",
     "slowTime": "Slows duck movement for 2 seconds - use during swarm spawns",
     "coinMultiplier": "Doubles coin value for next 5 ducks - use on small ducks"
-  }
+  },
+  "berriesAvailable": [0, 1, 2]
 }

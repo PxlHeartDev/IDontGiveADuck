@@ -20,5 +20,6 @@
   "targetSuccessRate": 0.95,
   "learningObjective": "Teach basic clicking mechanics without any pressure",
   "powerUpsAvailable": false,
-  "continueSpawning": true
+  "continueSpawning": true,
+  "berriesAvailable": [0]
 }

@@ -20,5 +20,6 @@
   "targetSuccessRate": 0.75,
   "learningObjective": "Demonstrate how multiple parameters create progression",
   "powerUpsAvailable": false,
-  "continueSpawning": true
+  "continueSpawning": true,
+  "berriesAvailable": [0, 1]
 }

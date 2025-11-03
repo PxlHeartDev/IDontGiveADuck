@@ -20,5 +20,6 @@
   "targetSuccessRate": 0.65,
   "learningObjective": "Balance speed increases with precision requirements",
   "powerUpsAvailable": false,
-  "continueSpawning": true
+  "continueSpawning": true,
+  "berriesAvailable": [0, 1]
 }

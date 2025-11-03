@@ -23,7 +23,6 @@ public class DecoyDuck : BaseDuck
     public override void Initialize(float customLifetime = -1, int customPointValue = -1)
     {
         base.Initialize(customLifetime, customPointValue);
-    
     }
     
     #endregion

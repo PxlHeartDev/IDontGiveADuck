@@ -20,5 +20,6 @@
   "targetSuccessRate": 0.90,
   "learningObjective": "Introduce decoy concept with minimal penalty",
   "powerUpsAvailable": false,
-  "continueSpawning": true
+  "continueSpawning": true,
+  "berriesAvailable": [0]
 }

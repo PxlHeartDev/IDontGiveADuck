@@ -16,7 +16,7 @@ public class GoodDuck : BaseDuck
     protected override void Start()
     {
         base.Start();
-        
+        destroyDelay = successParticles.main.duration;
     }
     
     #region Abstract Implementation
@@ -84,9 +84,8 @@ public class GoodDuck : BaseDuck
         // Particle effect
         if (successParticles != null)
         {
-            ParticleSystem effect = Instantiate(successParticles, transform.position, transform.rotation);
-            effect.Play();
-            Destroy(effect.gameObject, effect.main.duration);
+            successParticles.Play();
+            Destroy(successParticles.gameObject, successParticles.main.duration);
         }
         
         // Sound effect - use AudioManager for consistency

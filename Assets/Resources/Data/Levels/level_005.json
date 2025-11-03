@@ -20,5 +20,6 @@
   "targetSuccessRate": 0.70,
   "learningObjective": "Show how predictability can offset increased difficulty",
   "powerUpsAvailable": false,
-  "continueSpawning": true
+  "continueSpawning": true,
+  "berriesAvailable": [0, 1]
 }

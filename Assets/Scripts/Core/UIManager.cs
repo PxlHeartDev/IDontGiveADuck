@@ -43,6 +43,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject instructionsPanel;   // Container for game instructions
     [SerializeField] private Button startGameButton;         // Button to start the game
     [SerializeField] private Button testLevel12Button;       // Button to jump to test level
+
+    [Header("Main Menu Panel")]
+    [SerializeField] private GameObject mainMenuPanel;
     
     // ===== DEVELOPMENT TOOLS =====
     // These settings help during development and testing
@@ -95,7 +98,7 @@ public class UIManager : MonoBehaviour
         
         // Start with a clean UI state
         HideHUDElements();
-        ShowInstructions();
+        ShowMainMenu();
     }
     
     /// <summary>
@@ -227,7 +230,7 @@ public class UIManager : MonoBehaviour
         switch (newState)
         {
             case GameState.Menu:
-                ShowInstructions();
+                ShowMainMenu();
                 break;
             case GameState.Playing:
                 ShowGameHUD();
@@ -277,29 +280,26 @@ public class UIManager : MonoBehaviour
         if (levelText != null) levelText.gameObject.SetActive(true);
         if (progressText != null) progressText.gameObject.SetActive(true);
     }
-    
+
     #endregion
-    
+
     #region Panel Management
     // These methods control which UI panels are shown/hidden
     // Each method handles a specific game state or UI screen
-    
+
     /// <summary>
-    /// Shows the instructions panel at the start of the game
-    /// If no instructions panel exists, starts the game immediately
+    /// Shows the main menu panel at the start of the game
+    /// If no main menu panel exists, starts the game immediately
     /// </summary>
-    private void ShowInstructions()
+    private void ShowMainMenu()
     {
         SetAllPanelsInactive();  // Hide all other panels first
         HideHUDElements();       // Hide HUD elements
         
-        if (instructionsPanel != null)
-        {
-            instructionsPanel.SetActive(true);
-        }
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
         else
         {
-            // If no instructions panel, start the game immediately
+            // If no main menu panel, start the game immediately
             if (GameManager.Instance != null)
                 GameManager.Instance.StartGame(true);
         }
@@ -408,6 +408,7 @@ public class UIManager : MonoBehaviour
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (pausePanel != null) pausePanel.SetActive(false);
         if (instructionsPanel != null) instructionsPanel.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
     }
     
     #endregion

@@ -20,5 +20,6 @@
   "targetSuccessRate": 0.85,
   "learningObjective": "Introduce small ducks and establish rhythm",
   "powerUpsAvailable": false,
-  "continueSpawning": true
+  "continueSpawning": true,
+  "berriesAvailable": [0]
 }

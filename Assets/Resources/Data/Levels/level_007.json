@@ -20,5 +20,6 @@
   "targetSuccessRate": 0.55,
   "learningObjective": "Create noticeable difficulty spike that challenges but doesn't break players",
   "powerUpsAvailable": false,
-  "continueSpawning": true
+  "continueSpawning": true,
+  "berriesAvailable": [0, 1, 2]
 }

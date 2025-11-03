@@ -21,5 +21,6 @@
   "learningObjective": "Create clear skill gate that filters player progression",
   "powerUpsAvailable": true,
   "continueSpawning": true,
-  "recommendedStrategy": "Use Time Boost early, save Slow-Time for final 10 seconds"
+  "recommendedStrategy": "Use Time Boost early, save Slow-Time for final 10 seconds",
+  "berriesAvailable": [0, 1, 2]
 }

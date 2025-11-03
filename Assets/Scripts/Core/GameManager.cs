@@ -17,7 +17,9 @@ public class GameManager : MonoBehaviour
 {
     // Singleton pattern - accessible from anywhere in the game
     public static GameManager Instance { get; private set; }
-    
+
+    [SerializeField] private ItemManager itemManager;
+
     [Header("Game Configuration")]
     [SerializeField] private int startingLives = 1;    // Number of lives player starts with
     [SerializeField] private int currentLevelId = 1;   // Current level being played

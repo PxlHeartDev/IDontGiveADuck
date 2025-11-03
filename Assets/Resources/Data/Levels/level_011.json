@@ -21,5 +21,6 @@
   "learningObjective": "Push players to their mechanical and decision-making limits",
   "powerUpsAvailable": true,
   "continueSpawning": true,
-  "recommendedStrategy": "Strategic power-up timing essential - coordinate Slow-Time with overlapping spawns"
+  "recommendedStrategy": "Strategic power-up timing essential - coordinate Slow-Time with overlapping spawns",
+  "berriesAvailable": [0, 1, 2]
 }

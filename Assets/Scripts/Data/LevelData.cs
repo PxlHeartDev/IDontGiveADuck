@@ -32,4 +32,9 @@ public class LevelData
     public float targetSuccessRate;
     public string learningObjective;
     public bool powerUpsAvailable;
+
+    public ItemManager.Berry[] berriesAvailable =
+    {
+        ItemManager.Berry.Blue,
+    };
 }

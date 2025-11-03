@@ -15,10 +15,13 @@ using System.Collections.Generic;
 /// </summary>
 public class DuckSpawner : MonoBehaviour
 {
+
+    [SerializeField] private ItemManager itemManager;
+
     // ===== DUCK PREFABS =====
     // These arrays store the different duck prefabs that can be spawned
     // Each array has exactly 3 elements: Large, Medium, and Small ducks
-    
+
     [Header("Duck Prefabs")]
     [SerializeField] private GameObject[] goodDuckPrefabs; // [0]=Large, [1]=Medium, [2]=Small
     [SerializeField] private GameObject[] decoyDuckPrefabs; // [0]=Large, [1]=Medium, [2]=Small
@@ -70,7 +73,7 @@ public class DuckSpawner : MonoBehaviour
         {
             SetupDefaultSpawnArea();
         }
-        
+
         // Check that all required prefabs are properly configured
         ValidatePrefabs();
     }

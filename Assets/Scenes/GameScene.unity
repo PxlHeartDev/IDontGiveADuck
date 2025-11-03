@@ -385,7 +385,6 @@ RectTransform:
   - {fileID: 1061021106}
   - {fileID: 1857516191}
   - {fileID: 1806401392}
-  - {fileID: 1555476423}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -419,8 +418,9 @@ MonoBehaviour:
   resumeButton: {fileID: 517342501}
   pauseRestartButton: {fileID: 797499273}
   instructionsPanel: {fileID: 1061021105}
-  startGameButton: {fileID: 427323595}
+  startGameButton: {fileID: 608374572}
   testLevel12Button: {fileID: 84889}
+  mainMenuPanel: {fileID: 1806401391}
   showTestButton: 1
   testButtonLevel: 5
   showDebugInfo: 1
@@ -1451,7 +1451,7 @@ GameObject:
   - component: {fileID: 608374573}
   - component: {fileID: 608374572}
   m_Layer: 5
-  m_Name: Button
+  m_Name: PlayButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1519,7 +1519,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 608374573}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1909912756}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: StartGame
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &608374573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3873,13 +3885,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1555476422}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 608374571}
-  m_Father: {fileID: 55474495}
+  m_Father: {fileID: 1806401392}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -4395,11 +4407,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1806401391}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1555476423}
   m_Father: {fileID: 55474495}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4455,6 +4468,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1857516191}
   - component: {fileID: 1857516192}
+  - component: {fileID: 1857516193}
   m_Layer: 5
   m_Name: ItemPanel
   m_TagString: Untagged
@@ -4491,6 +4505,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1857516190}
   m_CullTransparentMesh: 1
+--- !u!114 &1857516193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1857516190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfd4602329701be4a80d9799be1241e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blueButton: {fileID: 1110943272}
+  redButton: {fileID: 1273333173}
+  yellowButton: {fileID: 1413804129}
+  equipped: 0
 --- !u!1 &1909912755
 GameObject:
   m_ObjectHideFlags: 0
@@ -4520,6 +4550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2469f51734140c4e859e9a4c2097105, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemManager: {fileID: 1857516193}
   startingLives: 1
   currentLevelId: 1
   testLevelId: 12
@@ -4785,6 +4816,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb08053325422a1449934d0cb3167cc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemManager: {fileID: 1857516193}
   goodDuckPrefabs:
   - {fileID: 1115852952343671650, guid: 8aec8799a6a61f1468bafdcf4c85687a, type: 3}
   - {fileID: 1115852952343671650, guid: 4aed8a1fbc97cf84bb21865376c618c7, type: 3}

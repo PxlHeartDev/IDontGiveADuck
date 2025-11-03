@@ -26,5 +26,6 @@
     "extraCoins": 500,
     "unlockMessage": "Master Duck Hunter Achieved!",
     "specialReward": "golden_duck_skin"
-  }
+  },
+  "berriesAvailable": [0, 1, 2]
 }
