@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,14 +12,16 @@ public class ItemManager : MonoBehaviour
 
     public enum Berry
     {
-        Blue,
-        Red,
-        Yellow,
+        Blue = 0,
+        Red = 1,
+        Yellow = 2,
     }
 
-    public Berry equipped = Berry.Blue;
+    public BerryItem equipped;
 
-    public System.Action<Berry> OnEquippedChanged;
+    public static System.Action<BerryItem> OnEquippedChanged;
+
+    public Dictionary<Berry, BerryItem> Berries = new();
 
 
     private void Start()
@@ -28,11 +31,22 @@ public class ItemManager : MonoBehaviour
         blueButton.onClick.AddListener(BlueButtonPressed);
         redButton.onClick.AddListener(RedButtonPressed);
         yellowButton.onClick.AddListener(YellowButtonPressed);
+
+        Berries.Add(Berry.Blue, new BerryItem(Berry.Blue, "Blue", Resources.Load<Sprite>("Sprites/Berries/Blue")));
+        Berries.Add(Berry.Red, new BerryItem(Berry.Red, "Red", Resources.Load<Sprite>("Sprites/Berries/Red")));
+        Berries.Add(Berry.Yellow, new BerryItem(Berry.Yellow, "Yellow", Resources.Load<Sprite>("Sprites/Berries/Yellow")));
+
+        equipped = GetBerry(Berry.Blue);
     }
 
     private void OnDestroy()
     {
         GameManager.Instance.AnyLevelLoaded -= LevelLoaded;
+    }
+
+    public BerryItem GetBerry(Berry type)
+    {
+        return Berries[type];
     }
 
     void LevelLoaded(LevelData level)
@@ -55,17 +69,31 @@ public class ItemManager : MonoBehaviour
 
     public void BlueButtonPressed()
     {
-        equipped = Berry.Blue;
+        equipped = GetBerry(Berry.Blue);
         OnEquippedChanged?.Invoke(equipped);
     }
     public void RedButtonPressed()
     {
-        equipped = Berry.Red;
+        equipped = GetBerry(Berry.Red);
         OnEquippedChanged?.Invoke(equipped);
     }
     public void YellowButtonPressed()
     {
-        equipped = Berry.Yellow;
+        equipped = GetBerry(Berry.Yellow);
         OnEquippedChanged?.Invoke(equipped);
+    }
+}
+
+public class BerryItem
+{
+    public ItemManager.Berry type;
+    public string Name { get; private set; }
+    public Sprite Image { get; private set; }
+
+    public BerryItem(ItemManager.Berry _type, string _name, Sprite _image)
+    {
+        type = _type;
+        Name = _name;
+        Image = _image;
     }
 }

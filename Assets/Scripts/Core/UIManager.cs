@@ -26,6 +26,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI livesText;      // Shows remaining lives
     [SerializeField] private TextMeshProUGUI levelText;      // Shows current level number
     [SerializeField] private TextMeshProUGUI progressText;   // Shows progress (ducks clicked/required)
+    [SerializeField] private Image berryEquippedIndicator;
     
     [Header("Game Over Panel")]
     [SerializeField] private GameObject gameOverPanel;       // Container for game over UI
@@ -94,6 +95,8 @@ public class UIManager : MonoBehaviour
             GameManager.Instance.OnTimeChanged += UpdateTimer;         // When time changes
             GameManager.Instance.OnGameStateChanged += UpdateGameState; // When game state changes
             GameManager.Instance.OnLevelLoaded += UpdateLevelInfo;     // When new level loads
+
+            ItemManager.OnEquippedChanged += UpdateEquippedBerry;
         }
         
         // Start with a clean UI state
@@ -214,6 +217,11 @@ public class UIManager : MonoBehaviour
             int required = GameManager.Instance.GoodDucksRequired;
             progressText.text = $"Progress: {clicked}/{required}";
         }
+    }
+
+    public void UpdateEquippedBerry(BerryItem Berry)
+    {
+        berryEquippedIndicator.sprite = Berry.Image;
     }
     
     #endregion

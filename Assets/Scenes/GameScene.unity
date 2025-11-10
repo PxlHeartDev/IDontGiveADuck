@@ -409,6 +409,7 @@ MonoBehaviour:
   livesText: {fileID: 0}
   levelText: {fileID: 422073455}
   progressText: {fileID: 1024446085}
+  berryEquippedIndicator: {fileID: 525511562}
   gameOverPanel: {fileID: 1774303611}
   gameOverTitle: {fileID: 1941380119}
   finalScoreText: {fileID: 746666280}
@@ -3893,10 +3894,10 @@ RectTransform:
   - {fileID: 608374571}
   m_Father: {fileID: 1806401392}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -600, y: -600}
+  m_SizeDelta: {x: 1536, y: 768}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1555476424
 MonoBehaviour:
@@ -3911,15 +3912,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.29559743, g: 0.29559743, b: 0.29559743, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 8167106763392272915, guid: 590827e0c3f7ca2458a61ed84642031c, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -4520,7 +4521,6 @@ MonoBehaviour:
   blueButton: {fileID: 1110943272}
   redButton: {fileID: 1273333173}
   yellowButton: {fileID: 1413804129}
-  equipped: 0
 --- !u!1 &1909912755
 GameObject:
   m_ObjectHideFlags: 0
