@@ -26,6 +26,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI livesText;      // Shows remaining lives
     [SerializeField] private TextMeshProUGUI levelText;      // Shows current level number
     [SerializeField] private TextMeshProUGUI progressText;   // Shows progress (ducks clicked/required)
+    [SerializeField] private Slider progressBar;
     [SerializeField] private Image berryEquippedIndicator;
     
     [Header("Game Over Panel")]
@@ -164,7 +165,7 @@ public class UIManager : MonoBehaviour
     public void UpdateScore(int score)
     {
         if (scoreText != null)
-            scoreText.text = $"Score: {score:N0}";
+            scoreText.text = $"{score:N0}";
     }
     
     /// <summary>
@@ -182,7 +183,7 @@ public class UIManager : MonoBehaviour
             int minutes = Mathf.FloorToInt(timeLeft / 60);  // FloorToInt rounds down to nearest integer
             int seconds = Mathf.FloorToInt(timeLeft % 60);  // % is modulo operator (remainder after division)
 
-            timerText.text = $"Time: {minutes:00}:{seconds:00}";  // :00 format ensures 2 digits
+            timerText.text = $"{minutes:00}:{seconds:00}";  // :00 format ensures 2 digits
             
             // Change colour to red when time is running low
             if (timeLeft <= timerWarningThreshold)
@@ -208,7 +209,7 @@ public class UIManager : MonoBehaviour
     public void UpdateLevelInfo(LevelData levelData)
     {
         if (levelText != null)
-            levelText.text = $"Level: {levelData.levelId}";
+            levelText.text = $"{levelData.levelId}";
         
         UpdateProgress();
     }
@@ -218,11 +219,25 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public void UpdateProgress()
     {
-        if (progressText != null && GameManager.Instance != null)
+        int clicked;
+        int required;
+
+        if (GameManager.Instance != null)
         {
-            int clicked = GameManager.Instance.GoodDucksClicked;
-            int required = GameManager.Instance.GoodDucksRequired;
-            progressText.text = $"Progress: {clicked}/{required}";
+            clicked = GameManager.Instance.GoodDucksClicked;
+            required = GameManager.Instance.GoodDucksRequired;
+        }
+        else return;
+
+        if (progressText != null)
+        {
+            progressText.text = $"{clicked}/{required}";
+        }
+
+        if (progressBar != null)
+        {
+            progressBar.value = clicked;
+            progressBar.maxValue = required;
         }
     }
 
