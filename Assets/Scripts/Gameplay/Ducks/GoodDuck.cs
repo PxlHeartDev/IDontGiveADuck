@@ -23,6 +23,8 @@ public class GoodDuck : BaseDuck
     
     protected override void OnClicked()
     {
+        // Reset transparency
+        sprite.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
         Debug.Log($"Good duck clicked! Awarded {pointValue} points");
         
         // Notify game manager
@@ -64,12 +66,6 @@ public class GoodDuck : BaseDuck
         
         // Ensure proper tag for identification
         gameObject.tag = "GoodDuck";
-    }
-    
-    protected override void OnLifetimeLow()
-    {
-        base.OnLifetimeLow();
-        // Could add sprite swap or animation here if needed
     }
     
     #endregion

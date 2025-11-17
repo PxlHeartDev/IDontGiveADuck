@@ -584,6 +584,8 @@ public class GameManager : MonoBehaviour
         #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
         #endif
+
+        Debug.Log("Game quitting");
     }
     
     #endregion

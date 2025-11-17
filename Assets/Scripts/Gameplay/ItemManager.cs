@@ -21,7 +21,7 @@ public class ItemManager : MonoBehaviour
 
     public static System.Action<BerryItem> OnEquippedChanged;
 
-    public Dictionary<Berry, BerryItem> Berries = new();
+    public static Dictionary<Berry, BerryItem> Berries = new();
 
 
     private void Start()
@@ -44,7 +44,7 @@ public class ItemManager : MonoBehaviour
         GameManager.Instance.AnyLevelLoaded -= LevelLoaded;
     }
 
-    public BerryItem GetBerry(Berry type)
+    public static BerryItem GetBerry(Berry type)
     {
         return Berries[type];
     }
@@ -62,6 +62,12 @@ public class ItemManager : MonoBehaviour
 
     void UpdateButtons(bool blue, bool red, bool yellow)
     {  
+        // If only blue is enabled, disable all buttons to avoid confusion
+        if (blue && !red && !yellow)
+        {
+            UpdateButtons(false, false, false);
+            return;
+        }
         blueButton.gameObject.SetActive(blue);
         redButton.gameObject.SetActive(red);
         yellowButton.gameObject.SetActive(yellow);
@@ -87,13 +93,13 @@ public class ItemManager : MonoBehaviour
 public class BerryItem
 {
     public ItemManager.Berry type;
-    public string Name { get; private set; }
-    public Sprite Image { get; private set; }
+    public string name { get; private set; }
+    public Sprite sprite { get; private set; }
 
-    public BerryItem(ItemManager.Berry _type, string _name, Sprite _image)
+    public BerryItem(ItemManager.Berry _type, string _name, Sprite _sprite)
     {
         type = _type;
-        Name = _name;
-        Image = _image;
+        name = _name;
+        sprite = _sprite;
     }
 }

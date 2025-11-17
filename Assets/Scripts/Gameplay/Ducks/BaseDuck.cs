@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-
 /// <summary>
 /// Abstract base class for all duck types
 /// Provides common functionality and enforces consistent interface
@@ -12,10 +11,12 @@ public abstract class BaseDuck : MonoBehaviour
     [SerializeField] protected float lifetime = 5f;
     [SerializeField] protected float moveSpeed = 0f; // For future moving ducks
 
-    public ItemManager.Berry favouriteBerry = ItemManager.Berry.Blue;
-    protected float destroyDelay;
+    [Header("Berry Stuff")]
+    [SerializeField] public ItemManager.Berry favouriteBerry = ItemManager.Berry.Blue;
+    [SerializeField] private SpriteRenderer favouriteIndicator;
 
     [Header("Visual Feedback")]
+    [SerializeField] protected SpriteRenderer sprite;
     [SerializeField] protected ParticleSystem destroyEffect;
     [SerializeField] protected AudioClip clickSound;
     
@@ -23,10 +24,12 @@ public abstract class BaseDuck : MonoBehaviour
     protected float currentLifetime;
     protected bool isClicked = false;
     protected bool isInitialized = false;
-    
+    protected float destroyDelay;
+
     // Public properties for external access
     public int PointValue => pointValue;
     public bool IsClicked => isClicked;
+    public bool expired;
 
     #region Unity Lifecycle
     
@@ -156,16 +159,20 @@ public abstract class BaseDuck : MonoBehaviour
     /// </summary>
     protected virtual void HandleLifetime()
     {
-        currentLifetime -= Time.deltaTime;
-        
-        // Visual feedback as lifetime gets low
-        if (currentLifetime <= 1f)
+        // Only do logic if needed
+        if (currentLifetime > 0)
         {
-            OnLifetimeLow();
+            currentLifetime -= Time.deltaTime;
+
+            // Visual feedback as lifetime gets low
+            if (currentLifetime <= 1f)
+            {
+                OnLifetimeLow();
+            }
         }
-        
-        if (currentLifetime <= 0 && !isClicked)
+        else if (!isClicked && !expired)
         {
+            expired = true;
             OnLifetimeExpired();
             DestroyDuck();
         }
@@ -201,8 +208,9 @@ public abstract class BaseDuck : MonoBehaviour
         
         GetComponent<SpriteRenderer>().enabled = false;
 
-        // Remove duck from scene
-        Destroy(gameObject, destroyDelay);
+        favouriteIndicator.enabled = false;
+        // Remove duck from scene       Only do delay if clicked
+        Destroy(gameObject, isClicked ? destroyDelay : 0.0f);
     }
     
     #endregion
@@ -228,6 +236,7 @@ public abstract class BaseDuck : MonoBehaviour
     /// </summary>
     protected virtual void OnDuckSpawned()
     {
+        SetIndicator();
         // Default implementation - can be overridden
         Debug.Log($"{GetType().Name} spawned at position {transform.position} with {currentLifetime}s lifetime and fav berry {favouriteBerry}");
     }
@@ -237,8 +246,7 @@ public abstract class BaseDuck : MonoBehaviour
     /// </summary>
     protected virtual void OnLifetimeLow()
     {
-        // Default implementation - visual warning
-        // Override for custom low-lifetime effects
+        sprite.color = new Color(1.0f, 1.0f, 1.0f, currentLifetime);
     }
     
     #endregion
@@ -255,6 +263,19 @@ public abstract class BaseDuck : MonoBehaviour
             Gizmos.DrawWireSphere(transform.position + Vector3.up, 0.5f);
         }
     }
-    
+
+    #endregion
+
+    #region Berry Stuff
+
+    private void SetIndicator(bool shown = true)
+    {
+        favouriteIndicator.enabled = shown;
+        if (shown)
+        {
+            favouriteIndicator.sprite = ItemManager.GetBerry(favouriteBerry).sprite;
+        }
+    }
+
     #endregion
 }

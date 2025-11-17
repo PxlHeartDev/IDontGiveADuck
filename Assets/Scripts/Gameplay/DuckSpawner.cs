@@ -325,11 +325,9 @@ public class DuckSpawner : MonoBehaviour
         
         // If no decoys left, always spawn good ducks
         if (decoyDucksRemaining <= 0) return true;
-        
-        // Calculate spawn probability based on remaining decoys and good duck spawns
-        // This creates a balanced mix of duck types
-        float totalRemaining = decoyDucksRemaining + 1; // +1 for potential good duck
-        float goodDuckProbability = 1f / totalRemaining;
+
+        // Spawn probability should only change a small amount based on rates
+        float goodDuckProbability = 1.0f - (0.5f * (float)decoyDucksRemaining / (float)currentLevel.decoyDucks);
         
         // Add some randomness to avoid predictable patterns
         goodDuckProbability += Random.Range(-0.1f, 0.1f);

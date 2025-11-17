@@ -34,7 +34,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI finalScoreText; // Shows final score or restart message
     [SerializeField] private Button restartButton;           // Button to restart current level
     [SerializeField] private Button nextLevelButton;         // Button to go to next level
-    
+    [SerializeField] private Image duckImage;                // Image renderer for the duck
+    [SerializeField] private Sprite goodDuckSprite;          // Good duck sprite
+    [SerializeField] private Sprite decoyDuckSprite;         // Decoy duck sprite
+
     [Header("Pause Panel")]
     [SerializeField] private GameObject pausePanel;          // Container for pause menu
     [SerializeField] private Button resumeButton;            // Button to resume game
@@ -172,9 +175,13 @@ public class UIManager : MonoBehaviour
     {
         if (timerText != null)
         {
+            // Prevent negatives
+            timeLeft = Mathf.Clamp(timeLeft, 0f, float.PositiveInfinity);
+
             // Convert total seconds to minutes and seconds
             int minutes = Mathf.FloorToInt(timeLeft / 60);  // FloorToInt rounds down to nearest integer
             int seconds = Mathf.FloorToInt(timeLeft % 60);  // % is modulo operator (remainder after division)
+
             timerText.text = $"Time: {minutes:00}:{seconds:00}";  // :00 format ensures 2 digits
             
             // Change colour to red when time is running low
@@ -221,7 +228,7 @@ public class UIManager : MonoBehaviour
 
     public void UpdateEquippedBerry(BerryItem Berry)
     {
-        berryEquippedIndicator.sprite = Berry.Image;
+        berryEquippedIndicator.sprite = Berry.sprite;
     }
     
     #endregion
@@ -247,6 +254,7 @@ public class UIManager : MonoBehaviour
                 ShowPausePanel();
                 break;
             case GameState.LevelComplete:
+                UpdateProgress(); // Update one more time to fix it not displying correctly
                 ShowLevelComplete();
                 break;
             case GameState.GameOver:
@@ -361,6 +369,9 @@ public class UIManager : MonoBehaviour
                 if (tmpText != null)
                     tmpText.text = nextLevel > 0 ? $"Next Level ({nextLevel})" : "Next Level";
             }
+
+            if (duckImage != null)
+                duckImage.sprite = goodDuckSprite;
         }
     }
     
@@ -382,6 +393,9 @@ public class UIManager : MonoBehaviour
             // Hide next level button since player failed
             if (nextLevelButton != null)
                 nextLevelButton.gameObject.SetActive(false);
+
+            if (duckImage != null)
+                duckImage.sprite = decoyDuckSprite;
         }
     }
     
@@ -404,6 +418,9 @@ public class UIManager : MonoBehaviour
             // Hide next level button since game is complete
             if (nextLevelButton != null)
                 nextLevelButton.gameObject.SetActive(false);
+
+            if (duckImage != null)
+                duckImage.sprite = goodDuckSprite;
         }
     }
     

@@ -31,7 +31,9 @@ public class DecoyDuck : BaseDuck
     
     protected override void OnClicked()
     {
-        
+        // Reset transparency
+        sprite.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+
         // Notify game manager about penalty
         if (GameManager.Instance != null)
         {
