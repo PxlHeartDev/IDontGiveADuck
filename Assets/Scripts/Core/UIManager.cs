@@ -27,6 +27,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelText;      // Shows current level number
     [SerializeField] private TextMeshProUGUI progressText;   // Shows progress (ducks clicked/required)
     [SerializeField] private Slider progressBar;
+    [SerializeField] private Image progressFillImage;
     [SerializeField] private Image berryEquippedIndicator;
     
     [Header("Game Over Panel")]
@@ -236,6 +237,8 @@ public class UIManager : MonoBehaviour
 
         if (progressBar != null)
         {
+            if (progressFillImage != null)
+                progressFillImage.enabled = clicked > 0;
             progressBar.value = clicked;
             progressBar.maxValue = required;
         }

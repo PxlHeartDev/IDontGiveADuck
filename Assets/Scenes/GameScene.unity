@@ -410,6 +410,7 @@ MonoBehaviour:
   levelText: {fileID: 422073455}
   progressText: {fileID: 1024446085}
   progressBar: {fileID: 526507589}
+  progressFillImage: {fileID: 982243597}
   berryEquippedIndicator: {fileID: 525511562}
   gameOverPanel: {fileID: 1774303611}
   gameOverTitle: {fileID: 1941380119}
