@@ -17,7 +17,7 @@ public class ItemManager : MonoBehaviour
         Yellow = 2,
     }
 
-    public BerryItem equipped;
+    public static BerryItem equipped;
 
     public static System.Action<BerryItem> OnEquippedChanged;
 

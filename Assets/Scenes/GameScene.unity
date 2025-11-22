@@ -4438,6 +4438,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   musicSource: {fileID: 0}
   sfxSource: {fileID: 0}
+  sfxSourceUI: {fileID: 0}
   menuMusic: {fileID: 8300000, guid: 9362a74eed4b9a94db2dfc18cdb2c4c0, type: 3}
   gameOverMusic: {fileID: 0}
   victoryMusic: {fileID: 0}
@@ -4446,8 +4447,8 @@ MonoBehaviour:
   challengeTheme: {fileID: 8300000, guid: ae40a015c678644b0ac6139e22717c04, type: 3}
   bossTheme: {fileID: 8300000, guid: ab372a7a374be074cb54cb03af2b1625, type: 3}
   levelStartSound: {fileID: 0}
-  levelCompleteSound: {fileID: 0}
-  gameOverSound: {fileID: 0}
+  levelCompleteSound: {fileID: 8300000, guid: 6a4f087fbd9dcb14f862e1842e7d3b68, type: 3}
+  gameOverSound: {fileID: 8300000, guid: c6702d0955f45e241856a966105b706e, type: 3}
   duckClickDecoySound: {fileID: 8300000, guid: e1acdd1bc4d1e8f4a871efbe1ea6e9ab, type: 3}
   duckClickGoodSound: {fileID: 8300000, guid: 92648bc8bb61f2142ad3ae9708c86a30, type: 3}
   masterVolume: 1

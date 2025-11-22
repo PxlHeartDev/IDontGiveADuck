@@ -25,7 +25,6 @@ public class GoodDuck : BaseDuck
     {
         // Reset transparency
         sprite.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-        Debug.Log($"Good duck clicked! Awarded {pointValue} points");
         
         // Notify game manager
         if (GameManager.Instance != null)

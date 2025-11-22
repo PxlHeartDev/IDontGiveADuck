@@ -386,12 +386,22 @@ public class GameManager : MonoBehaviour
     public void OnGoodDuckClicked(GoodDuck duck)
     {
         if (currentState != GameState.Playing) return;
-        
-        score += duck.PointValue;
+
+        bool usedFavourite = ItemManager.equipped.type == duck.favouriteBerry;
+
+        int scoreToAdd = duck.PointValue;
+
+        if (usedFavourite)
+            scoreToAdd += Mathf.CeilToInt((float)(duck.PointValue) / 2.0f);
+
+        score += scoreToAdd;
+
         goodDucksClicked++;
         
         OnScoreChanged?.Invoke(score);
-        
+
+        Debug.Log($"Good duck clicked!{(usedFavourite ? " Favourite berry used, +50% score." : "")} Awarded {scoreToAdd} points");
+
         // Check win condition - player got required good ducks
         if (goodDucksClicked >= currentLevel.goodDucks)
         {
