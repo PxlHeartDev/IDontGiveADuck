@@ -48,7 +48,7 @@ public class SaveLoader : MonoBehaviour
         saveData = new();
         List<int> scores = new();
 
-        for (int i = 0; i < LevelLoader.Instance.levelCount; i++)
+        for (int i = 0; i < LevelLoader.Instance.GetLevelCount(); i++)
             scores.Add(0);
 
         saveData.scores = scores;

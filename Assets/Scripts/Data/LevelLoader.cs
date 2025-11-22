@@ -18,7 +18,7 @@ public class LevelLoader : MonoBehaviour
     // Cache to store loaded levels and avoid reloading from disk
     private Dictionary<int, LevelData> levelCache = new Dictionary<int, LevelData>();
 
-    public int levelCount;
+    public int levelCount = -1;
     
     void Awake()
     {
@@ -35,14 +35,16 @@ public class LevelLoader : MonoBehaviour
             Destroy(gameObject);
         }
 
+
         levelCount = GetLevelCount();
-        SaveLoader.Instance.LoadData();
     }
 
     public int GetLevelCount() => (GetLevelCount(1) - 1);
 
     public int GetLevelCount(int levelId)
     {
+        if (levelCount != -1) return levelCount;
+
         string fileName = $"level_{levelId:D3}";
 
         TextAsset levelFile = Resources.Load<TextAsset>($"Data/Levels/{fileName}");

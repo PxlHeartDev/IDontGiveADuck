@@ -29,6 +29,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Slider progressBar;
     [SerializeField] private Image progressFillImage;
     [SerializeField] private Image berryEquippedIndicator;
+    [SerializeField] private GameObject mainHUD;
+    [SerializeField] private GameObject itemHUD;
     
     [Header("Game Over Panel")]
     [SerializeField] private GameObject gameOverPanel;       // Container for game over UI
@@ -50,9 +52,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button startGameButton;         // Button to start the game
     [SerializeField] private Button testLevel12Button;       // Button to jump to test level
 
-    [Header("Main Menu Panel")]
+    [Header("Main Menu Panels")]
     [SerializeField] private GameObject mainMenuPanel;
-    
+    [SerializeField] private GameObject levelSelectPanel;
+    [SerializeField] private GridLayoutGroup levelSelectGrid;
+    [SerializeField] private Button buttonPrefab;
+
     // ===== DEVELOPMENT TOOLS =====
     // These settings help during development and testing
     
@@ -83,6 +88,7 @@ public class UIManager : MonoBehaviour
         
         // Set up all button click listeners
         SetupButtonListeners();
+        SetupLevelSelectButtons();
     }
     
     /// <summary>
@@ -147,10 +153,21 @@ public class UIManager : MonoBehaviour
             resumeButton.onClick.AddListener(OnResumeClicked);
         if (pauseRestartButton != null)
             pauseRestartButton.onClick.AddListener(OnRestartClicked);
-        if (startGameButton != null)
-            startGameButton.onClick.AddListener(OnStartGameClicked);
+        //if (startGameButton != null)
+        //    startGameButton.onClick.AddListener(OnStartGameClicked);
         if (testLevel12Button != null)
             testLevel12Button.onClick.AddListener(OnTestLevelClicked);
+    }
+
+    private void SetupLevelSelectButtons()
+    {
+        for (int i = 1; i <= LevelLoader.Instance.GetLevelCount(); i++)
+        {
+            int levelId = i;
+            Button newLevelButton = Instantiate(buttonPrefab, levelSelectGrid.transform);
+            newLevelButton.GetComponentInChildren<TextMeshProUGUI>().text = "Level " + i.ToString();
+            newLevelButton.onClick.AddListener(() => OnLevelButtonClicked(levelId));
+        }
     }
     
     #endregion
@@ -300,6 +317,8 @@ public class UIManager : MonoBehaviour
         if (livesText != null) livesText.gameObject.SetActive(false);
         if (levelText != null) levelText.gameObject.SetActive(false);
         if (progressText != null) progressText.gameObject.SetActive(false);
+        if (mainHUD != null) mainHUD.SetActive(false);
+        if (itemHUD != null) itemHUD.SetActive(false);
     }
     
     /// <summary>
@@ -313,6 +332,8 @@ public class UIManager : MonoBehaviour
         if (livesText != null) livesText.gameObject.SetActive(true);
         if (levelText != null) levelText.gameObject.SetActive(true);
         if (progressText != null) progressText.gameObject.SetActive(true);
+        if (mainHUD != null) mainHUD.SetActive(true);
+        if (itemHUD != null) itemHUD.SetActive(true);
     }
 
     #endregion
@@ -441,6 +462,12 @@ public class UIManager : MonoBehaviour
                 duckImage.sprite = goodDuckSprite;
         }
     }
+
+    public void ShowLevelSelect()
+    {
+        SetAllPanelsInactive();
+        if (levelSelectPanel != null) levelSelectPanel.SetActive(true);
+    }
     
     /// <summary>
     /// Hides all UI panels at once
@@ -452,6 +479,7 @@ public class UIManager : MonoBehaviour
         if (pausePanel != null) pausePanel.SetActive(false);
         if (instructionsPanel != null) instructionsPanel.SetActive(false);
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+        if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
     }
     
     #endregion
@@ -521,6 +549,12 @@ public class UIManager : MonoBehaviour
             Debug.Log($"Test button clicked - jumping to level {testButtonLevel}");
             GameManager.Instance.JumpToLevel(testButtonLevel);
         }
+    }
+
+    private void OnLevelButtonClicked(int levelId)
+    {
+        Debug.Log(levelId);
+        GameManager.Instance.JumpToLevel(levelId);
     }
     
     #endregion
