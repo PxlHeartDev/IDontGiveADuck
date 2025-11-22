@@ -18,7 +18,8 @@ public class AudioManager : MonoBehaviour
     [Header("Audio Sources")]
     [SerializeField] private AudioSource musicSource;  // Dedicated source for background music
     [SerializeField] private AudioSource sfxSource;    // Dedicated source for sound effects
-    
+    [SerializeField] private AudioSource sfxSourceUI;  // Dedicated source for UI sound effects
+
     [Header("Background Music")]
     [SerializeField] private AudioClip menuMusic;      // Music for main menu
     [SerializeField] private AudioClip gameOverMusic;  // Music for game over screen
@@ -118,7 +119,16 @@ public class AudioManager : MonoBehaviour
             sfxSource = sfxObj.AddComponent<AudioSource>();
             sfxSource.playOnAwake = false;     // Don't start playing immediately
         }
-        
+
+        // Create UI SFX source if it doesn't exist
+        if (sfxSourceUI == null)
+        {
+            GameObject sfxObj = new GameObject("SFXSource");
+            sfxObj.transform.SetParent(transform);
+            sfxSourceUI = sfxObj.AddComponent<AudioSource>();
+            sfxSourceUI.playOnAwake = false;   // Don't start playing immediately
+        }
+
         // Apply initial volume settings
         UpdateVolumeSettings();
     }
@@ -192,9 +202,9 @@ public class AudioManager : MonoBehaviour
     {
         if (clip == null || sfxSource == null) return;
         
-        sfxSource.clip = clip;
-        sfxSource.volume = sfxVolume * masterVolume;
-        sfxSource.Play();
+        sfxSourceUI.clip = clip;
+        sfxSourceUI.volume = sfxVolume * masterVolume;
+        sfxSourceUI.Play();
     }
     
     #endregion
