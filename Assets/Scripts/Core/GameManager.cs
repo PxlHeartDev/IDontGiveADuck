@@ -131,7 +131,7 @@ public class GameManager : MonoBehaviour
         
         // Load level data from JSON file
         currentLevel = LevelLoader.Instance.LoadLevel(currentLevelId);
-        
+
         if (currentLevel == null)
         {
             Debug.LogError($"Failed to load level {currentLevelId}");
@@ -144,7 +144,7 @@ public class GameManager : MonoBehaviour
         goodDucksMissed = 0;
         totalDucksSpawned = 0;
         totalGoodDucksSpawned = 0;
-        
+
         // Notify other systems (UI, Audio) about the new level
         OnLevelLoaded?.Invoke(currentLevel);
     }
@@ -187,6 +187,9 @@ public class GameManager : MonoBehaviour
         }
         
         currentLevelId = levelId;
+
+        currentState = GameState.Playing;
+
         LoadCurrentLevel();
         StartGame(false);
     }
@@ -285,6 +288,10 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void StartGame(bool fromMenu = false)
     {
+        // Reset score
+        score = 0;
+        OnScoreChanged.Invoke(score);
+
         if (currentLevel == null)
         {
             Debug.LogError("Cannot start game - no level loaded!");

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public class SaveLoader : MonoBehaviour
 {
@@ -27,6 +28,8 @@ public class SaveLoader : MonoBehaviour
             // If another instance exists, destroy this duplicate
             Destroy(gameObject);
         }
+
+        LoadData();
     }
 
     public void LoadData()
@@ -46,12 +49,12 @@ public class SaveLoader : MonoBehaviour
     public void CreateEmptyData()
     {
         saveData = new();
-        List<int> scores = new();
+        List<int> hiScores = new();
 
         for (int i = 0; i < LevelLoader.Instance.GetLevelCount(); i++)
-            scores.Add(0);
+            hiScores.Add(0);
 
-        saveData.scores = scores;
+        saveData.hiScores = hiScores;
 
         // If file already exists, clear it out
         if (File.Exists(filePath))

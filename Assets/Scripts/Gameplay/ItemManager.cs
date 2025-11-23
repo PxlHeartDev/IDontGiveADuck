@@ -26,7 +26,7 @@ public class ItemManager : MonoBehaviour
 
     private void Start()
     {
-        GameManager.Instance.AnyLevelLoaded += LevelLoaded;
+        GameManager.Instance.OnLevelLoaded += LevelLoaded;
 
         blueButton.onClick.AddListener(BlueButtonPressed);
         redButton.onClick.AddListener(RedButtonPressed);
@@ -41,7 +41,7 @@ public class ItemManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        GameManager.Instance.AnyLevelLoaded -= LevelLoaded;
+        GameManager.Instance.OnLevelLoaded -= LevelLoaded;
     }
 
     public static BerryItem GetBerry(Berry type)

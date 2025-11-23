@@ -88,7 +88,7 @@ public class UIManager : MonoBehaviour
         
         // Set up all button click listeners
         SetupButtonListeners();
-        SetupLevelSelectButtons();
+        Invoke("SetupLevelSelectButtons", 0.1f);
     }
     
     /// <summary>
@@ -111,8 +111,8 @@ public class UIManager : MonoBehaviour
         }
         
         // Start with a clean UI state
-        HideHUDElements();
-        ShowMainMenu();
+        Invoke("HideHUDElements", 0.1f);
+        Invoke("ShowMainMenu", 0.1f);
     }
     
     /// <summary>
@@ -129,6 +129,8 @@ public class UIManager : MonoBehaviour
             GameManager.Instance.OnTimeChanged -= UpdateTimer;
             GameManager.Instance.OnGameStateChanged -= UpdateGameState;
             GameManager.Instance.OnLevelLoaded -= UpdateLevelInfo;
+
+            ItemManager.OnEquippedChanged -= UpdateEquippedBerry;
         }
     }
     
@@ -165,8 +167,19 @@ public class UIManager : MonoBehaviour
         {
             int levelId = i;
             Button newLevelButton = Instantiate(buttonPrefab, levelSelectGrid.transform);
-            newLevelButton.GetComponentInChildren<TextMeshProUGUI>().text = "Level " + i.ToString();
+            newLevelButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Level " + i.ToString();
+            newLevelButton.transform.GetChild(1).GetComponentInChildren<TextMeshProUGUI>().text = SaveLoader.Instance.saveData.hiScores[i - 1].ToString();
             newLevelButton.onClick.AddListener(() => OnLevelButtonClicked(levelId));
+
+            if (i == 1)
+                continue;
+
+            // Lock level if previous has not been completed
+            if (SaveLoader.Instance.saveData.hiScores[i-2] <= 0)
+            {
+                newLevelButton.interactable = false;
+                newLevelButton.image.color = Color.red;
+            }
         }
     }
     
@@ -384,6 +397,17 @@ public class UIManager : MonoBehaviour
     /// </summary>
     private void ShowLevelComplete()
     {
+        // Save score
+        int oldHiScore = SaveLoader.Instance.saveData.hiScores[GameManager.Instance.CurrentLevelId - 1];
+
+        bool newBest = GameManager.Instance.Score > oldHiScore;
+
+        if (newBest)
+        {
+            SaveLoader.Instance.saveData.hiScores[GameManager.Instance.CurrentLevelId - 1] = GameManager.Instance.Score;
+            SaveLoader.Instance.SaveDataToFile();
+        }
+
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
@@ -394,7 +418,7 @@ public class UIManager : MonoBehaviour
 
             // Show the final score
             if (finalScoreText != null && GameManager.Instance != null)
-                finalScoreText.text = $"Final Score: {GameManager.Instance.Score:N0}";
+                finalScoreText.text = $"Level Score: {GameManager.Instance.Score:N0}{(newBest ? "\nNew best!" : "")}";
 
             // Show/hide next level button based on whether there is a next level
             if (nextLevelButton != null)
@@ -427,7 +451,7 @@ public class UIManager : MonoBehaviour
                 gameOverTitle.text = "Level Failed!";
             
             if (finalScoreText != null && GameManager.Instance != null)
-                finalScoreText.text = "Restart from Level 1";
+                finalScoreText.text = "";
             
             // Hide next level button since player failed
             if (nextLevelButton != null)
