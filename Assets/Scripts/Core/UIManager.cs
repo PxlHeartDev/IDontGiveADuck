@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
+using System.Collections.Generic;
 
 /// <summary>
 /// UIManager - Centralised UI system for the game
@@ -72,6 +73,10 @@ public class UIManager : MonoBehaviour
     
     // ===== PRIVATE VARIABLES =====
     private Color originalTimerColor;  // Stores the original timer colour to restore it later
+
+    private List<Button> levelButtons = new();
+
+    private int highestCompletedLevel = 0;
     
     #region Unity Lifecycle
     // Unity automatically calls these methods at specific times during the game's lifecycle
@@ -167,20 +172,27 @@ public class UIManager : MonoBehaviour
         {
             int levelId = i;
             Button newLevelButton = Instantiate(buttonPrefab, levelSelectGrid.transform);
-            newLevelButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Level " + i.ToString();
+
+            levelButtons.Add(newLevelButton);
+
+            newLevelButton.name = "Level" + i;
+            newLevelButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Level " + LevelLoader.Instance.LoadLevel(i).levelName;
             newLevelButton.transform.GetChild(1).GetComponentInChildren<TextMeshProUGUI>().text = SaveLoader.Instance.saveData.hiScores[i - 1].ToString();
             newLevelButton.onClick.AddListener(() => OnLevelButtonClicked(levelId));
 
-            if (i == 1)
-                continue;
+            // Set highest level if level has a stored score
+            if (SaveLoader.Instance.saveData.hiScores[i-1] > 0)
+                highestCompletedLevel = i;
 
             // Lock level if previous has not been completed
-            if (SaveLoader.Instance.saveData.hiScores[i-2] <= 0)
+            if (i > 1 && SaveLoader.Instance.saveData.hiScores[i-2] <= 0)
             {
                 newLevelButton.interactable = false;
                 newLevelButton.image.color = Color.red;
             }
         }
+
+        LevelLoader.Instance.ClearCache();
     }
     
     #endregion
@@ -304,6 +316,7 @@ public class UIManager : MonoBehaviour
             case GameState.LevelComplete:
                 UpdateProgress(); // Update one more time to fix it not displying correctly
                 ShowLevelComplete();
+                UpdateLevelSelectButtons(GameManager.Instance.CurrentLevel.levelId);
                 break;
             case GameState.GameOver:
                 ShowGameOver(false);
@@ -506,6 +519,27 @@ public class UIManager : MonoBehaviour
         if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
     }
     
+    private void UpdateLevelSelectButtons(int levelId)
+    {
+        Button curLevelSelectButton = levelButtons[levelId - 1];
+        curLevelSelectButton.transform.GetChild(1).GetComponentInChildren<TextMeshProUGUI>().text = SaveLoader.Instance.saveData.hiScores[levelId - 1].ToString();
+
+        if (levelId > highestCompletedLevel)
+        {
+            if (levelId < LevelLoader.Instance.GetLevelCount())
+            {
+                Button nextLevelSelectButton = levelButtons[levelId];
+
+                Debug.Log(nextLevelSelectButton);
+
+                nextLevelSelectButton.interactable = true;
+                nextLevelSelectButton.image.color = Color.white;
+            }
+
+            highestCompletedLevel = levelId;
+        }
+    }
+
     #endregion
     
     #region Button Handlers
