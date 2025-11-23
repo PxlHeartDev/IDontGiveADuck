@@ -378,6 +378,10 @@ public class GameManager : MonoBehaviour
 
     public void QuitToMenu()
     {
+        DuckSpawner spawner = FindFirstObjectByType<DuckSpawner>();
+        if (spawner != null)
+            spawner.StopSpawning();
+
         currentState = GameState.Menu;
         OnGameStateChanged?.Invoke(currentState);
         Time.timeScale = 1.0f;

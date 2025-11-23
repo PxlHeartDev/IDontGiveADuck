@@ -22,43 +22,45 @@ public class UIManager : MonoBehaviour
     // The [SerializeField] attribute makes private fields visible in the Inspector
     
     [Header("HUD Elements")]
-    [SerializeField] private TextMeshProUGUI scoreText;      // Shows current score
-    [SerializeField] private TextMeshProUGUI timerText;      // Shows time remaining
-    [SerializeField] private TextMeshProUGUI livesText;      // Shows remaining lives
-    [SerializeField] private TextMeshProUGUI levelText;      // Shows current level number
-    [SerializeField] private TextMeshProUGUI progressText;   // Shows progress (ducks clicked/required)
-    [SerializeField] private Slider progressBar;
-    [SerializeField] private Image progressFillImage;
-    [SerializeField] private Image berryEquippedIndicator;
-    [SerializeField] private GameObject mainHUD;
-    [SerializeField] private GameObject itemHUD;
-    
+    [SerializeField] private TextMeshProUGUI scoreText;         // Shows current score
+    [SerializeField] private TextMeshProUGUI timerText;         // Shows time remaining
+    [SerializeField] private TextMeshProUGUI livesText;         // Shows remaining lives
+    [SerializeField] private TextMeshProUGUI levelText;         // Shows current level number
+    [SerializeField] private TextMeshProUGUI progressText;      // Shows progress (ducks clicked/required)
+    [SerializeField] private Slider progressBar;                // HUD progress bar
+    [SerializeField] private Image progressFillImage;           // HUD progress bar fill image
+    [SerializeField] private Image berryEquippedIndicator;      // HUD element showing equipped berry
+    [SerializeField] private GameObject mainHUD;                // Main HUD at the top of the screen
+    [SerializeField] private GameObject itemHUD;                // Item selection/display HUD
+
     [Header("Game Over Panel")]
-    [SerializeField] private GameObject gameOverPanel;       // Container for game over UI
-    [SerializeField] private TextMeshProUGUI gameOverTitle;  // "Level Complete!" or "Level Failed!"
-    [SerializeField] private TextMeshProUGUI finalScoreText; // Shows final score or restart message
-    [SerializeField] private Button retryButton;             // Button to retry current level
-    [SerializeField] private Button nextLevelButton;         // Button to go to next level
+    [SerializeField] private GameObject gameOverPanel;          // Container for game over UI
+    [SerializeField] private TextMeshProUGUI gameOverTitle;     // "Level Complete!" or "Level Failed!"
+    [SerializeField] private TextMeshProUGUI finalScoreText;    // Shows final score or restart message
+    [SerializeField] private Button retryButton;                // Button to retry current level
+    [SerializeField] private Button nextLevelButton;            // Button to go to next level
     [SerializeField] private Button quitButton;
-    [SerializeField] private Image duckImage;                // Image renderer for the duck
-    [SerializeField] private Sprite goodDuckSprite;          // Good duck sprite
-    [SerializeField] private Sprite decoyDuckSprite;         // Decoy duck sprite
+    [SerializeField] private Image duckImage;                   // Image renderer for the duck
+    [SerializeField] private Sprite goodDuckSprite;             // Good duck sprite
+    [SerializeField] private Sprite decoyDuckSprite;            // Decoy duck sprite
 
     [Header("Pause Panel")]
-    [SerializeField] private GameObject pausePanel;          // Container for pause menu
-    [SerializeField] private Button resumeButton;            // Button to resume game
-    [SerializeField] private Button pauseQuitButton;        // Button to retry from pause menu
+    [SerializeField] private GameObject pausePanel;             // Container for pause menu
+    [SerializeField] private Button resumeButton;               // Button to resume game
+    [SerializeField] private Button pauseQuitButton;            // Button to retry from pause menu
     
     [Header("Instructions Panel")]
-    [SerializeField] private GameObject instructionsPanel;   // Container for game instructions
-    [SerializeField] private Button startGameButton;         // Button to start the game
-    [SerializeField] private Button testLevel12Button;       // Button to jump to test level
+    [SerializeField] private GameObject instructionsPanel;      // Container for game instructions
+    [SerializeField] private Button startGameButton;            // Button to start the game
+    [SerializeField] private Button testLevel12Button;          // Button to jump to test level
 
     [Header("Main Menu Panels")]
-    [SerializeField] private GameObject mainMenuPanel;
-    [SerializeField] private GameObject levelSelectPanel;
-    [SerializeField] private GridLayoutGroup levelSelectGrid;
-    [SerializeField] private Button buttonPrefab;
+    [SerializeField] private GameObject mainMenuPanel;          // Panel containing the main menu
+    [SerializeField] private Button mainMenuPlayButton;         // Play button from main menu
+    [SerializeField] private Button mainMenuQuitButton;         // Quit button from main menu
+    [SerializeField] private GameObject levelSelectPanel;       // Panel for level select screen
+    [SerializeField] private GridLayoutGroup levelSelectGrid;   // Grid organising component of level select screen
+    [SerializeField] private Button buttonPrefab;               // Level select button prefab
 
     // ===== DEVELOPMENT TOOLS =====
     // These settings help during development and testing
@@ -71,6 +73,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private bool showDebugInfo = true;      // Toggle to show debug information on screen
     [SerializeField] private Color timerWarningColor = Color.red;  // Colour when time is running low
     [SerializeField] private float timerWarningThreshold = 10f;    // Time remaining when warning starts
+
+    [Header("Other")]
+    [SerializeField] private AudioClip blip;
     
     // ===== PRIVATE VARIABLES =====
     private Color originalTimerColor;  // Stores the original timer colour to restore it later
@@ -152,21 +157,46 @@ public class UIManager : MonoBehaviour
     {
         // Each button.onClick.AddListener() connects a button to a method
         // When the button is clicked, the method will be called automatically
-        
-        if (retryButton != null)
+
+        if (retryButton != null) {
+            retryButton.onClick.AddListener(OnAnyButtonClicked);
             retryButton.onClick.AddListener(OnRetryClicked);
+        }
         if (nextLevelButton != null)
+        {
+            nextLevelButton.onClick.AddListener(OnAnyButtonClicked);
             nextLevelButton.onClick.AddListener(OnNextLevelClicked);
+        }
         if (quitButton != null)
+        {
+            quitButton.onClick.AddListener(OnAnyButtonClicked);
             quitButton.onClick.AddListener(OnQuitToMenuPressed);
+        }
         if (resumeButton != null)
+        {
+            resumeButton.onClick.AddListener(OnAnyButtonClicked);
             resumeButton.onClick.AddListener(OnResumeClicked);
+        }
         if (pauseQuitButton != null)
+        {
+            pauseQuitButton.onClick.AddListener(OnAnyButtonClicked);
             pauseQuitButton.onClick.AddListener(OnQuitToMenuPressed);
-        //if (startGameButton != null)
-        //    startGameButton.onClick.AddListener(OnStartGameClicked);
+        }
         if (testLevel12Button != null)
+        {
+            testLevel12Button.onClick.AddListener(OnAnyButtonClicked);
             testLevel12Button.onClick.AddListener(OnTestLevelClicked);
+        }
+
+        if (mainMenuPlayButton != null)
+        {
+            mainMenuPlayButton.onClick.AddListener(OnAnyButtonClicked);
+        }
+
+        if (mainMenuQuitButton != null)
+        {
+            mainMenuQuitButton.onClick.AddListener(OnAnyButtonClicked);
+        }
     }
 
     private void SetupLevelSelectButtons()
@@ -181,6 +211,7 @@ public class UIManager : MonoBehaviour
             newLevelButton.name = "Level" + i;
             newLevelButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = LevelLoader.Instance.LoadLevel(i).levelName;
             newLevelButton.transform.GetChild(1).GetComponentInChildren<TextMeshProUGUI>().text = SaveLoader.Instance.saveData.hiScores[i - 1].ToString();
+            newLevelButton.onClick.AddListener(OnAnyButtonClicked);
             newLevelButton.onClick.AddListener(() => OnLevelButtonClicked(levelId));
 
             // Set highest level if level has a stored score
@@ -546,6 +577,11 @@ public class UIManager : MonoBehaviour
     #endregion
     
     #region Button Handlers
+    private void OnAnyButtonClicked()
+    {
+        AudioManager.Instance?.PlayUISFX(blip, 0.2f);
+    }
+
     // These methods are called when UI buttons are clicked
     // They communicate with the GameManager to perform game actions
     
@@ -608,18 +644,18 @@ public class UIManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             Debug.Log($"Test button clicked - jumping to level {testButtonLevel}");
-            GameManager.Instance.JumpToLevel(testButtonLevel);
+            GameManager.Instance?.JumpToLevel(testButtonLevel);
         }
     }
 
     private void OnLevelButtonClicked(int levelId)
     {
-        GameManager.Instance.JumpToLevel(levelId);
+        GameManager.Instance?.JumpToLevel(levelId);
     }
 
     private void OnQuitToMenuPressed()
     {
-        GameManager.Instance.QuitToMenu();
+        GameManager.Instance?.QuitToMenu();
     }
     
     #endregion

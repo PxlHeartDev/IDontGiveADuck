@@ -431,6 +431,8 @@ MonoBehaviour:
   startGameButton: {fileID: 608374572}
   testLevel12Button: {fileID: 84889}
   mainMenuPanel: {fileID: 1806401391}
+  mainMenuPlayButton: {fileID: 608374572}
+  mainMenuQuitButton: {fileID: 1352369007}
   levelSelectPanel: {fileID: 1276992407}
   levelSelectGrid: {fileID: 817175332}
   buttonPrefab: {fileID: 8389918152331912294, guid: e76601ef35d63b648a269b17bbc678fb, type: 3}
@@ -439,6 +441,7 @@ MonoBehaviour:
   showDebugInfo: 1
   timerWarningColor: {r: 1, g: 0, b: 0, a: 1}
   timerWarningThreshold: 10
+  blip: {fileID: 8300000, guid: 5fc4bb8b96f375e43aa01d4591113d24, type: 3}
 --- !u!1 &80962716
 GameObject:
   m_ObjectHideFlags: 0

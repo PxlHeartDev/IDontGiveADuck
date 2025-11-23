@@ -74,7 +74,7 @@ public class AudioManager : MonoBehaviour
             GameManager.Instance.OnGameStateChanged += OnGameStateChanged;
             GameManager.Instance.OnLevelLoaded += OnLevelLoaded;
         }
-        
+
         // Start with menu music
         PlayMusic(menuMusic);
     }
@@ -129,6 +129,8 @@ public class AudioManager : MonoBehaviour
             sfxSourceUI.playOnAwake = false;   // Don't start playing immediately
         }
 
+
+        SetMusicVolume(0.07f);
         // Apply initial volume settings
         UpdateVolumeSettings();
     }
@@ -183,8 +185,8 @@ public class AudioManager : MonoBehaviour
     {
         if (clip == null || sfxSource == null) return;
         
-        // Duck sounds need to be louder than regular SFX
-        float duckVolumeMultiplier = 20.0f;
+        // Duck sounds need to be quieter than regular SFX
+        float duckVolumeMultiplier = 0.2f;
         float finalVolume = sfxVolume * masterVolume * duckVolumeMultiplier;
 
         sfxSource.pitch = 1.0f + Random.Range(-pitchVariation, pitchVariation);
@@ -192,17 +194,18 @@ public class AudioManager : MonoBehaviour
         sfxSource.volume = finalVolume;
         sfxSource.Play();
     }
-    
+
     /// <summary>
     /// Plays UI sound effects (not positional)
     /// 
     /// Used for menu sounds, level start/complete sounds
     /// These sounds don't need 3D positioning
     /// </summary>
-    public void PlayUISFX(AudioClip clip)
+    public void PlayUISFX(AudioClip clip, float pitchVariation = 0.0f)
     {
         if (clip == null || sfxSource == null) return;
-        
+
+        sfxSourceUI.pitch = 1.0f + Random.Range(-pitchVariation, pitchVariation);
         sfxSourceUI.clip = clip;
         sfxSourceUI.volume = sfxVolume * masterVolume;
         sfxSourceUI.Play();
@@ -227,7 +230,7 @@ public class AudioManager : MonoBehaviour
                 PlayMusic(menuMusic);
                 break;
             case GameState.Playing:
-                PlayUISFX(levelStartSound);
+                //PlayUISFX(levelStartSound);
                 break;
             case GameState.LevelComplete:
                 PlayUISFX(levelCompleteSound);
@@ -336,6 +339,7 @@ public class AudioManager : MonoBehaviour
     {
         if (musicSource != null)
             musicSource.volume = musicVolume * masterVolume;
+        Debug.Log(musicSource.volume);
         
         if (sfxSource != null)
             sfxSource.volume = sfxVolume * masterVolume;
