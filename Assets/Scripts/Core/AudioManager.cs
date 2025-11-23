@@ -179,14 +179,15 @@ public class AudioManager : MonoBehaviour
     /// Used for duck sounds that should appear to come from the duck's location
     /// Includes a volume multiplier for duck sounds to make them more audible
     /// </summary>
-    public void PlaySFXAtPosition(AudioClip clip, Vector3 position)
+    public void PlaySFXAtPosition(AudioClip clip, Vector3 position, float pitchVariation = 0.0f)
     {
         if (clip == null || sfxSource == null) return;
         
         // Duck sounds need to be louder than regular SFX
         float duckVolumeMultiplier = 20.0f;
         float finalVolume = sfxVolume * masterVolume * duckVolumeMultiplier;
-        
+
+        sfxSource.pitch = 1.0f + Random.Range(-pitchVariation, pitchVariation);
         sfxSource.clip = clip;
         sfxSource.volume = finalVolume;
         sfxSource.Play();
@@ -306,7 +307,7 @@ public class AudioManager : MonoBehaviour
     {
         if (duckClickDecoySound != null)
         {
-            PlaySFXAtPosition(duckClickDecoySound, position);
+            PlaySFXAtPosition(duckClickDecoySound, position, 0.2f);
         }
     }
     
@@ -317,7 +318,7 @@ public class AudioManager : MonoBehaviour
     {
         if (duckClickGoodSound != null)
         {
-            PlaySFXAtPosition(duckClickGoodSound, position);
+            PlaySFXAtPosition(duckClickGoodSound, position, 0.2f);
         }
     }
     
