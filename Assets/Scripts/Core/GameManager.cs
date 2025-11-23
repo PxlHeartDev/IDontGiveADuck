@@ -235,7 +235,7 @@ public class GameManager : MonoBehaviour
     /// This is a complete reset - all progress is lost
     /// Returns the player to the main menu
     /// </summary>
-    public void RestartLevel()
+    public void RetryLevel()
     {
         // Stop current duck spawning
         DuckSpawner spawner = FindFirstObjectByType<DuckSpawner>();
@@ -245,7 +245,6 @@ public class GameManager : MonoBehaviour
         }
         
         // Complete reset to level 1
-        currentLevelId = 1;
         score = 0;
         lives = 1;
         
@@ -261,11 +260,11 @@ public class GameManager : MonoBehaviour
         OnLivesChanged?.Invoke(lives);
         OnScoreChanged?.Invoke(score);
         OnTimeChanged?.Invoke(timeLeft);
-        
+
         // Load level 1 and return to menu
+        currentState = GameState.Playing;
         LoadCurrentLevel();
-        currentState = GameState.Menu;
-        OnGameStateChanged?.Invoke(currentState);
+        StartGame(false);
     }
 
     #endregion
@@ -375,6 +374,13 @@ public class GameManager : MonoBehaviour
         }
         
         OnGameStateChanged?.Invoke(currentState);
+    }
+
+    public void QuitToMenu()
+    {
+        currentState = GameState.Menu;
+        OnGameStateChanged?.Invoke(currentState);
+        Time.timeScale = 1.0f;
     }
     
     #endregion

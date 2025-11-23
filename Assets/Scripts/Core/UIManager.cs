@@ -37,8 +37,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject gameOverPanel;       // Container for game over UI
     [SerializeField] private TextMeshProUGUI gameOverTitle;  // "Level Complete!" or "Level Failed!"
     [SerializeField] private TextMeshProUGUI finalScoreText; // Shows final score or restart message
-    [SerializeField] private Button restartButton;           // Button to restart current level
+    [SerializeField] private Button retryButton;             // Button to retry current level
     [SerializeField] private Button nextLevelButton;         // Button to go to next level
+    [SerializeField] private Button quitButton;
     [SerializeField] private Image duckImage;                // Image renderer for the duck
     [SerializeField] private Sprite goodDuckSprite;          // Good duck sprite
     [SerializeField] private Sprite decoyDuckSprite;         // Decoy duck sprite
@@ -46,7 +47,7 @@ public class UIManager : MonoBehaviour
     [Header("Pause Panel")]
     [SerializeField] private GameObject pausePanel;          // Container for pause menu
     [SerializeField] private Button resumeButton;            // Button to resume game
-    [SerializeField] private Button pauseRestartButton;      // Button to restart from pause menu
+    [SerializeField] private Button pauseQuitButton;        // Button to retry from pause menu
     
     [Header("Instructions Panel")]
     [SerializeField] private GameObject instructionsPanel;   // Container for game instructions
@@ -152,14 +153,16 @@ public class UIManager : MonoBehaviour
         // Each button.onClick.AddListener() connects a button to a method
         // When the button is clicked, the method will be called automatically
         
-        if (restartButton != null)
-            restartButton.onClick.AddListener(OnRestartClicked);
+        if (retryButton != null)
+            retryButton.onClick.AddListener(OnRetryClicked);
         if (nextLevelButton != null)
             nextLevelButton.onClick.AddListener(OnNextLevelClicked);
+        if (quitButton != null)
+            quitButton.onClick.AddListener(OnQuitToMenuPressed);
         if (resumeButton != null)
             resumeButton.onClick.AddListener(OnResumeClicked);
-        if (pauseRestartButton != null)
-            pauseRestartButton.onClick.AddListener(OnRestartClicked);
+        if (pauseQuitButton != null)
+            pauseQuitButton.onClick.AddListener(OnQuitToMenuPressed);
         //if (startGameButton != null)
         //    startGameButton.onClick.AddListener(OnStartGameClicked);
         if (testLevel12Button != null)
@@ -176,7 +179,7 @@ public class UIManager : MonoBehaviour
             levelButtons.Add(newLevelButton);
 
             newLevelButton.name = "Level" + i;
-            newLevelButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Level " + LevelLoader.Instance.LoadLevel(i).levelName;
+            newLevelButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = LevelLoader.Instance.LoadLevel(i).levelName;
             newLevelButton.transform.GetChild(1).GetComponentInChildren<TextMeshProUGUI>().text = SaveLoader.Instance.saveData.hiScores[i - 1].ToString();
             newLevelButton.onClick.AddListener(() => OnLevelButtonClicked(levelId));
 
@@ -563,9 +566,9 @@ public class UIManager : MonoBehaviour
     /// Called when any restart button is clicked
     /// Restarts the current level
     /// </summary>
-    private void OnRestartClicked()
+    private void OnRetryClicked()
     {
-        GameManager.Instance?.RestartLevel();  // ?. is null-conditional operator - only calls if not null
+        GameManager.Instance?.RetryLevel();  // ?. is null-conditional operator - only calls if not null
     }
     
     /// <summary>
@@ -611,8 +614,12 @@ public class UIManager : MonoBehaviour
 
     private void OnLevelButtonClicked(int levelId)
     {
-        Debug.Log(levelId);
         GameManager.Instance.JumpToLevel(levelId);
+    }
+
+    private void OnQuitToMenuPressed()
+    {
+        GameManager.Instance.QuitToMenu();
     }
     
     #endregion
