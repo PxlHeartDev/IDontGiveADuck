@@ -246,6 +246,7 @@ public abstract class BaseDuck : MonoBehaviour
     /// </summary>
     protected virtual void OnLifetimeLow()
     {
+        favouriteIndicator.color = new Color(1.0f, 1.0f, 1.0f, currentLifetime);
         sprite.color = new Color(1.0f, 1.0f, 1.0f, currentLifetime);
     }
     

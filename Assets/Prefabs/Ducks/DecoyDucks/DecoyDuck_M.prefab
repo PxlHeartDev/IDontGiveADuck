@@ -157,7 +157,7 @@ MonoBehaviour:
   destroyEffect: {fileID: 0}
   clickSound: {fileID: 0}
   expired: 0
-  penaltyParticles: {fileID: 0}
+  penaltyParticles: {fileID: 6593218011933943663, guid: bfae9fb80d49519469bfd7a318100d9f, type: 3}
   penaltySound: {fileID: 0}
   timePenalty: 3
   penaltyTextPrefab: {fileID: 0}
