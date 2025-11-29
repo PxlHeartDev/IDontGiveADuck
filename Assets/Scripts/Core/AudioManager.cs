@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// AudioManager - Centralised audio system for the game
@@ -16,9 +17,9 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance { get; private set; }
     
     [Header("Audio Sources")]
-    [SerializeField] private AudioSource musicSource;  // Dedicated source for background music
-    [SerializeField] private AudioSource sfxSource;    // Dedicated source for sound effects
-    [SerializeField] private AudioSource sfxSourceUI;  // Dedicated source for UI sound effects
+    [SerializeField] private AudioSource musicSource;       // Dedicated source for background music
+    [SerializeField] private List<AudioSource> sfxSource;   // Dedicated sources for sound effects
+    [SerializeField] private AudioSource sfxSourceUI;       // Dedicated source for UI sound effects
 
     [Header("Background Music")]
     [SerializeField] private AudioClip menuMusic;      // Music for main menu
@@ -39,11 +40,15 @@ public class AudioManager : MonoBehaviour
     [Header("Duck Sounds")]
     [SerializeField] private AudioClip duckClickDecoySound; // Sound when clicking decoy duck
     [SerializeField] private AudioClip duckClickGoodSound;  // Sound when clicking good duck
+    [SerializeField] private AudioClip duckFavouriteSound;  // Sound when feeding a duck their favourite berry
     
     [Header("Volume Settings")]
     [Range(0f, 1f)] public float masterVolume = 1f;   // Overall volume control
     [Range(0f, 1f)] public float musicVolume = 0.5f;  // Music-specific volume
     [Range(0f, 1f)] public float sfxVolume = 1f;      // Sound effects volume
+
+    private int curSFXSource = 0;
+    private int favouriteCombo = 0;
     
     // Track current music to avoid restarting the same track
     private AudioClip currentMusic;
@@ -110,15 +115,16 @@ public class AudioManager : MonoBehaviour
             musicSource.loop = true;           // Music should loop continuously
             musicSource.playOnAwake = false;   // Don't start playing immediately
         }
-        
-        // Create SFX source if it doesn't exist
-        if (sfxSource == null)
+
+        sfxSource = new();
+        for (int i = 0; i < 10; i++)
         {
-            GameObject sfxObj = new GameObject("SFXSource");
+            GameObject sfxObj = new GameObject("SFXSource" + i);
             sfxObj.transform.SetParent(transform);
-            sfxSource = sfxObj.AddComponent<AudioSource>();
-            sfxSource.playOnAwake = false;     // Don't start playing immediately
+            sfxSource.Add(sfxObj.AddComponent<AudioSource>());
+            sfxSource[i].playOnAwake = false;     // Don't start playing immediately
         }
+        
 
         // Create UI SFX source if it doesn't exist
         if (sfxSourceUI == null)
@@ -170,29 +176,33 @@ public class AudioManager : MonoBehaviour
             currentMusic = null;
         }
     }
-    
+
     #endregion
-    
+
     #region Sound Effects
-    
+
     /// <summary>
     /// Plays sound effects at a specific position in 3D space
     /// 
     /// Used for duck sounds that should appear to come from the duck's location
     /// Includes a volume multiplier for duck sounds to make them more audible
     /// </summary>
-    public void PlaySFXAtPosition(AudioClip clip, Vector3 position, float pitchVariation = 0.0f)
+    public void PlaySFXAtPosition(AudioClip clip, Vector3 position, float pitchVariation = 0.0f, float pitch = 1.0f)
     {
         if (clip == null || sfxSource == null) return;
-        
+
         // Duck sounds need to be quieter than regular SFX
         float duckVolumeMultiplier = 0.2f;
         float finalVolume = sfxVolume * masterVolume * duckVolumeMultiplier;
 
-        sfxSource.pitch = 1.0f + Random.Range(-pitchVariation, pitchVariation);
-        sfxSource.clip = clip;
-        sfxSource.volume = finalVolume;
-        sfxSource.Play();
+        sfxSource[curSFXSource].pitch = pitch + Random.Range(-pitchVariation, pitchVariation);
+        sfxSource[curSFXSource].clip = clip;
+        sfxSource[curSFXSource].volume = finalVolume;
+        sfxSource[curSFXSource].Play();
+
+        curSFXSource++;
+        if (curSFXSource >= 10) 
+            curSFXSource = 0;
     }
 
     /// <summary>
@@ -230,6 +240,7 @@ public class AudioManager : MonoBehaviour
                 PlayMusic(menuMusic);
                 break;
             case GameState.Playing:
+                favouriteCombo = 0;
                 //PlayUISFX(levelStartSound);
                 break;
             case GameState.LevelComplete:
@@ -317,12 +328,20 @@ public class AudioManager : MonoBehaviour
     /// <summary>
     /// Plays sound when player clicks a good duck
     /// </summary>
-    public void PlayDuckClickGood(Vector3 position)
+    public void PlayDuckClickGood(Vector3 position, bool usedFavourite)
     {
         if (duckClickGoodSound != null)
         {
             PlaySFXAtPosition(duckClickGoodSound, position, 0.2f);
         }
+
+        if (usedFavourite)
+        {
+            PlaySFXAtPosition(duckFavouriteSound, position, 0.0f, 1.0f + Mathf.Clamp01(favouriteCombo * 0.1f));
+            favouriteCombo++;
+        }
+        else
+            favouriteCombo = 0;
     }
     
     #endregion
@@ -339,10 +358,12 @@ public class AudioManager : MonoBehaviour
     {
         if (musicSource != null)
             musicSource.volume = musicVolume * masterVolume;
-        Debug.Log(musicSource.volume);
-        
-        if (sfxSource != null)
-            sfxSource.volume = sfxVolume * masterVolume;
+
+        foreach (AudioSource source in sfxSource)
+        {
+            if (source != null)
+                source.volume = sfxVolume * masterVolume;
+        }
     }
     
     /// <summary>

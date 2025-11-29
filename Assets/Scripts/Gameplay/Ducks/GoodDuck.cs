@@ -86,7 +86,7 @@ public class GoodDuck : BaseDuck
         // Sound effect - use AudioManager for consistency
         if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.PlayDuckClickGood(transform.position);
+            AudioManager.Instance.PlayDuckClickGood(transform.position, favouriteBerry == ItemManager.equipped.type);
         }
         
         // Floating score text (optional)
