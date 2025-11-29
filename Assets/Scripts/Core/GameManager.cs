@@ -409,7 +409,7 @@ public class GameManager : MonoBehaviour
         int scoreToAdd = duck.PointValue;
 
         if (usedFavourite)
-            scoreToAdd += Mathf.CeilToInt((float)(duck.PointValue) / 2.0f);
+            scoreToAdd += duck.PointValue;
 
         score += scoreToAdd;
 
