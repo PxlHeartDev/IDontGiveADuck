@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour
     public System.Action<LevelData> OnLevelLoaded;      // Fired when the first level is loaded
     public System.Action<LevelData> AnyLevelLoaded;     // Fired when a new level is loaded
 
+    public UIManager ui;
+
     #region Unity Lifecycle
 
     /// <summary>

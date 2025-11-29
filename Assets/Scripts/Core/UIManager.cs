@@ -29,7 +29,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI progressText;      // Shows progress (ducks clicked/required)
     [SerializeField] private Slider progressBar;                // HUD progress bar
     [SerializeField] private Image progressFillImage;           // HUD progress bar fill image
-    [SerializeField] private Image berryEquippedIndicator;      // HUD element showing equipped berry
     [SerializeField] private GameObject mainHUD;                // Main HUD at the top of the screen
     [SerializeField] private GameObject itemHUD;                // Item selection/display HUD
 
@@ -76,6 +75,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Other")]
     [SerializeField] private AudioClip blip;
+    [SerializeField] private Image tutorialImage;
     
     // ===== PRIVATE VARIABLES =====
     private Color originalTimerColor;  // Stores the original timer colour to restore it later
@@ -112,13 +112,12 @@ public class UIManager : MonoBehaviour
         // This is an example of the Observer pattern - UI "listens" for game changes
         if (GameManager.Instance != null)
         {
+            GameManager.Instance.ui = this;
             GameManager.Instance.OnScoreChanged += UpdateScore;        // When score changes
             GameManager.Instance.OnLivesChanged += UpdateLives;        // When lives change
             GameManager.Instance.OnTimeChanged += UpdateTimer;         // When time changes
             GameManager.Instance.OnGameStateChanged += UpdateGameState; // When game state changes
             GameManager.Instance.OnLevelLoaded += UpdateLevelInfo;     // When new level loads
-
-            ItemManager.OnEquippedChanged += UpdateEquippedBerry;
         }
         
         // Start with a clean UI state
@@ -140,8 +139,6 @@ public class UIManager : MonoBehaviour
             GameManager.Instance.OnTimeChanged -= UpdateTimer;
             GameManager.Instance.OnGameStateChanged -= UpdateGameState;
             GameManager.Instance.OnLevelLoaded -= UpdateLevelInfo;
-
-            ItemManager.OnEquippedChanged -= UpdateEquippedBerry;
         }
     }
     
@@ -319,11 +316,6 @@ public class UIManager : MonoBehaviour
             progressBar.maxValue = required;
         }
     }
-
-    public void UpdateEquippedBerry(BerryItem Berry)
-    {
-        berryEquippedIndicator.sprite = Berry.sprite;
-    }
     
     #endregion
     
@@ -342,6 +334,11 @@ public class UIManager : MonoBehaviour
                 ShowMainMenu();
                 break;
             case GameState.Playing:
+                if (!pausePanel.activeInHierarchy && GameManager.Instance.CurrentLevel.levelId == 1)
+                {
+                    tutorialImage.gameObject.SetActive(true);
+                    Time.timeScale = 0.0f;
+                }
                 ShowGameHUD();
                 break;
             case GameState.Paused:
@@ -571,6 +568,15 @@ public class UIManager : MonoBehaviour
             }
 
             highestCompletedLevel = levelId;
+        }
+    }
+
+    public void HideTut()
+    {
+        if (tutorialImage.gameObject.activeInHierarchy)
+        {
+            Time.timeScale = 1.0f;
+            tutorialImage.gameObject.SetActive(false);
         }
     }
 
