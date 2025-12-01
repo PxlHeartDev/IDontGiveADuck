@@ -41,6 +41,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip duckClickDecoySound; // Sound when clicking decoy duck
     [SerializeField] private AudioClip duckClickGoodSound;  // Sound when clicking good duck
     [SerializeField] private AudioClip duckFavouriteSound;  // Sound when feeding a duck their favourite berry
+    [SerializeField] private AudioClip duckNotFavourite;    // Sound when breaking the combo
     
     [Header("Volume Settings")]
     [Range(0f, 1f)] public float masterVolume = 1f;   // Overall volume control
@@ -340,8 +341,11 @@ public class AudioManager : MonoBehaviour
             PlaySFXAtPosition(duckFavouriteSound, position, 0.0f, 1.0f + Mathf.Clamp01(favouriteCombo * 0.1f));
             favouriteCombo++;
         }
-        else
+        else if (favouriteCombo > 0)
+        {
+            PlaySFXAtPosition(duckNotFavourite, position);
             favouriteCombo = 0;
+        }
     }
     
     #endregion
