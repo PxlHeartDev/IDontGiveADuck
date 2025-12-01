@@ -86,6 +86,9 @@ public class UIManager : MonoBehaviour
     private List<Button> levelButtons = new();
 
     private int highestCompletedLevel = 0;
+
+    Coroutine scoreRoutine;
+    Coroutine timeRoutine;
     
     #region Unity Lifecycle
     // Unity automatically calls these methods at specific times during the game's lifecycle
@@ -702,28 +705,52 @@ public class UIManager : MonoBehaviour
     public void ScorePopup(int score)
     {
         scorePopup.text = $"+{score}";
-        StopCoroutine(AnimateScorePopup());
-        StartCoroutine(AnimateScorePopup());
+        if (scoreRoutine != null)
+            StopCoroutine(scoreRoutine);
+        scoreRoutine = StartCoroutine(AnimateScorePopup());
     }
 
     public void TimePopup(int time)
     {
         timePopup.text = $"-{time}";
-        StopCoroutine(AnimateTimePopup());
-        StartCoroutine(AnimateTimePopup());
+        if (timeRoutine != null)
+            StopCoroutine(timeRoutine);
+        timeRoutine = StartCoroutine(AnimateTimePopup());
     }
 
     private IEnumerator<WaitForSeconds> AnimateScorePopup()
     {
         scorePopup.gameObject.SetActive(true);
-        yield return new WaitForSeconds(1.0f);
+        // Flash
+        for (int i = 0; i <= 10; i++)
+        {
+            scorePopup.color = Color.Lerp(Color.white, Color.forestGreen, (i * i) * 0.1f);
+            yield return new WaitForSeconds(0.1f);
+        }
+        // Fade
+        for (int i = 0; i <= 5; i++)
+        {
+            scorePopup.color = Color.Lerp(Color.forestGreen, Color.clear, i * 0.2f);
+            yield return new WaitForSeconds(0.1f);
+        }
         scorePopup.gameObject.SetActive(false);
     }
 
     private IEnumerator<WaitForSeconds> AnimateTimePopup()
     {
         timePopup.gameObject.SetActive(true);
-        yield return new WaitForSeconds(1.0f);
+        // Flash
+        for (int i = 0; i <= 10; i++)
+        {
+            timePopup.color = Color.Lerp(Color.white, Color.darkRed, (i * i) * 0.1f);
+            yield return new WaitForSeconds(0.1f);
+        }
+        // Fade
+        for (int i = 0; i <= 5; i++)
+        {
+            timePopup.color = Color.Lerp(Color.darkRed, Color.clear, i * 0.2f);
+            yield return new WaitForSeconds(0.1f);
+        }
         timePopup.gameObject.SetActive(false);
     }
 
