@@ -63,6 +63,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject levelSelectPanel;       // Panel for level select screen
     [SerializeField] private GridLayoutGroup levelSelectGrid;   // Grid organising component of level select screen
     [SerializeField] private Button buttonPrefab;               // Level select button prefab
+    [SerializeField] private Button levelSelectBackButton;      // Back button in the level select screen
 
     // ===== DEVELOPMENT TOOLS =====
     // These settings help during development and testing
@@ -208,6 +209,12 @@ public class UIManager : MonoBehaviour
             pauseButton.onClick.AddListener(OnAnyButtonClicked);
             pauseButton.onClick.AddListener(OnPauseClicked);
         }
+
+        if (levelSelectBackButton != null)
+        {
+            levelSelectBackButton.onClick.AddListener(OnAnyButtonClicked);
+            levelSelectBackButton.onClick.AddListener(ShowMainMenu);
+        }
     }
 
     private void RemoveButtonListeners()
@@ -222,6 +229,7 @@ public class UIManager : MonoBehaviour
             mainMenuPlayButton,
             mainMenuQuitButton,
             pauseButton,
+            levelSelectBackButton,
         };
 
 
