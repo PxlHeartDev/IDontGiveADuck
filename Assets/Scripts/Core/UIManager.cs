@@ -72,7 +72,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private int testButtonLevel = 12;       // Which level to jump to when test button is clicked
     
     [Header("Settings")]
-    [SerializeField] private bool showDebugInfo = true;      // Toggle to show debug information on screen
+    [SerializeField] private bool showDebugInfo = false;      // Toggle to show debug information on screen
     [SerializeField] private Color timerWarningColor = Color.red;  // Colour when time is running low
     [SerializeField] private float timerWarningThreshold = 10f;    // Time remaining when warning starts
 
