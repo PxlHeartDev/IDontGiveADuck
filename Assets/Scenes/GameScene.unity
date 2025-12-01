@@ -1976,7 +1976,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -2007,7 +2007,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -142.36057, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -5066,6 +5066,7 @@ MonoBehaviour:
   levelCompleteSound: {fileID: 8300000, guid: 6a4f087fbd9dcb14f862e1842e7d3b68, type: 3}
   gameOverSound: {fileID: 8300000, guid: c6702d0955f45e241856a966105b706e, type: 3}
   duckClickDecoySound: {fileID: 8300000, guid: e1acdd1bc4d1e8f4a871efbe1ea6e9ab, type: 3}
+  duckClickDecoySound2: {fileID: 8300000, guid: 8e91a9befbf89e24fb40aa68ae7ac5b8, type: 3}
   duckClickGoodSound: {fileID: 8300000, guid: 92648bc8bb61f2142ad3ae9708c86a30, type: 3}
   duckFavouriteSound: {fileID: 8300000, guid: 74f2accea9596d6488f9195d77e28060, type: 3}
   duckNotFavourite: {fileID: 8300000, guid: 25823beb7e4a69e46ba7dd3c4abde262, type: 3}
