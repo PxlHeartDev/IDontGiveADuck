@@ -426,6 +426,8 @@ public class GameManager : MonoBehaviour
         {
             EndGame(true);
         }
+
+        ui.ScorePopup(scoreToAdd);
     }
     
     /// <summary>
@@ -463,6 +465,8 @@ public class GameManager : MonoBehaviour
             timeLeft = 0;
             EndGame(false);
         }
+
+        ui.TimePopup(currentLevel.decoyPenalty);
     }
     
     /// <summary>

@@ -1,8 +1,9 @@
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.InputSystem;
-using TMPro;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.UI;
 
 /// <summary>
 /// UIManager - Centralised UI system for the game
@@ -31,6 +32,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Image progressFillImage;           // HUD progress bar fill image
     [SerializeField] private GameObject mainHUD;                // Main HUD at the top of the screen
     [SerializeField] private GameObject itemHUD;                // Item selection/display HUD
+    [SerializeField] private TextMeshProUGUI scorePopup;        // Popup for score increases
+    [SerializeField] private TextMeshProUGUI timePopup;         // Popup for time penalties
 
     [Header("Game Over Panel")]
     [SerializeField] private GameObject gameOverPanel;          // Container for game over UI
@@ -691,11 +694,43 @@ public class UIManager : MonoBehaviour
         if (GameManager.Instance?.CurrentState == GameState.Playing)
             UpdateProgress();
     }
-    
+
     #endregion
-    
+
+    #region Popups
+
+    public void ScorePopup(int score)
+    {
+        scorePopup.text = $"+{score}";
+        StopCoroutine(AnimateScorePopup());
+        StartCoroutine(AnimateScorePopup());
+    }
+
+    public void TimePopup(int time)
+    {
+        timePopup.text = $"-{time}";
+        StopCoroutine(AnimateTimePopup());
+        StartCoroutine(AnimateTimePopup());
+    }
+
+    private IEnumerator<WaitForSeconds> AnimateScorePopup()
+    {
+        scorePopup.gameObject.SetActive(true);
+        yield return new WaitForSeconds(1.0f);
+        scorePopup.gameObject.SetActive(false);
+    }
+
+    private IEnumerator<WaitForSeconds> AnimateTimePopup()
+    {
+        timePopup.gameObject.SetActive(true);
+        yield return new WaitForSeconds(1.0f);
+        timePopup.gameObject.SetActive(false);
+    }
+
+    #endregion
+
     #region Debug Info
-    
+
     /// <summary>
     /// Draws debug information on screen during development
     /// This method is called by Unity's GUI system
