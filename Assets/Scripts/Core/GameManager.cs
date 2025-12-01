@@ -419,7 +419,7 @@ public class GameManager : MonoBehaviour
         
         OnScoreChanged?.Invoke(score);
 
-        Debug.Log($"Good duck clicked!{(usedFavourite ? " Favourite berry used, +50% score." : "")} Awarded {scoreToAdd} points");
+        Debug.Log($"Good duck clicked!{(usedFavourite ? " Favourite berry used, +100% score." : "")} Awarded {scoreToAdd} points");
 
         // Check win condition - player got required good ducks
         if (goodDucksClicked >= currentLevel.goodDucks)
