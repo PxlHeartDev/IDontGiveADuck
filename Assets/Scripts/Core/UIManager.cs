@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
 /// <summary>
@@ -34,6 +33,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject itemHUD;                // Item selection/display HUD
     [SerializeField] private TextMeshProUGUI scorePopup;        // Popup for score increases
     [SerializeField] private TextMeshProUGUI timePopup;         // Popup for time penalties
+    [SerializeField] private Button pauseButton;
 
     [Header("Game Over Panel")]
     [SerializeField] private GameObject gameOverPanel;          // Container for game over UI
@@ -146,6 +146,8 @@ public class UIManager : MonoBehaviour
             GameManager.Instance.OnGameStateChanged -= UpdateGameState;
             GameManager.Instance.OnLevelLoaded -= UpdateLevelInfo;
         }
+
+        RemoveButtonListeners();
     }
     
     #endregion
@@ -173,7 +175,7 @@ public class UIManager : MonoBehaviour
         if (quitButton != null)
         {
             quitButton.onClick.AddListener(OnAnyButtonClicked);
-            quitButton.onClick.AddListener(OnQuitToMenuPressed);
+            quitButton.onClick.AddListener(OnQuitToMenuClicked);
         }
         if (resumeButton != null)
         {
@@ -183,7 +185,7 @@ public class UIManager : MonoBehaviour
         if (pauseQuitButton != null)
         {
             pauseQuitButton.onClick.AddListener(OnAnyButtonClicked);
-            pauseQuitButton.onClick.AddListener(OnQuitToMenuPressed);
+            pauseQuitButton.onClick.AddListener(OnQuitToMenuClicked);
         }
         if (testLevel12Button != null)
         {
@@ -199,6 +201,33 @@ public class UIManager : MonoBehaviour
         if (mainMenuQuitButton != null)
         {
             mainMenuQuitButton.onClick.AddListener(OnAnyButtonClicked);
+        }
+
+        if (pauseButton != null)
+        {
+            pauseButton.onClick.AddListener(OnAnyButtonClicked);
+            pauseButton.onClick.AddListener(OnPauseClicked);
+        }
+    }
+
+    private void RemoveButtonListeners()
+    {
+        Button[] buttons = {
+            retryButton,
+            nextLevelButton,
+            quitButton,
+            resumeButton,
+            pauseQuitButton,
+            testLevel12Button,
+            mainMenuPlayButton,
+            mainMenuQuitButton,
+            pauseButton,
+        };
+
+
+        foreach (Button button in buttons)
+        {
+            button.onClick.RemoveAllListeners();
         }
     }
 
@@ -665,9 +694,14 @@ public class UIManager : MonoBehaviour
         GameManager.Instance?.JumpToLevel(levelId);
     }
 
-    private void OnQuitToMenuPressed()
+    private void OnQuitToMenuClicked()
     {
         GameManager.Instance?.QuitToMenu();
+    }
+
+    private void OnPauseClicked()
+    {
+        GameManager.Instance?.TogglePause();
     }
     
     #endregion
