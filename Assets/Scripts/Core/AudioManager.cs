@@ -38,7 +38,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip gameOverSound;      // Sound when level is lost
     
     [Header("Duck Sounds")]
-    [SerializeField] private AudioClip duckClickDecoySound; // Sound when clicking decoy duck
+    [SerializeField] private AudioClip duckClickDecoySound; // Sound when clicking decoy 
+    [SerializeField] private AudioClip duckClickDecoySound2; // Sound when clicking decoy duck
     [SerializeField] private AudioClip duckClickGoodSound;  // Sound when clicking good duck
     [SerializeField] private AudioClip duckFavouriteSound;  // Sound when feeding a duck their favourite berry
     [SerializeField] private AudioClip duckNotFavourite;    // Sound when breaking the combo
@@ -323,6 +324,7 @@ public class AudioManager : MonoBehaviour
         if (duckClickDecoySound != null)
         {
             PlaySFXAtPosition(duckClickDecoySound, position, 0.2f);
+            PlaySFXAtPosition(duckClickDecoySound2, position, 0.2f);
         }
     }
     
