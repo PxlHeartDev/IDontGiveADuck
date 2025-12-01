@@ -744,9 +744,9 @@ public class UIManager : MonoBehaviour
 
     #region Popups
 
-    public void ScorePopup(int score)
+    public void ScorePopup(int score, bool isFromBonus = false)
     {
-        scorePopup.text = $"+{score}";
+        scorePopup.text = $"{(isFromBonus ? "Time Bonus!\n" : "")}+{score}";
         if (scoreRoutine != null)
             StopCoroutine(scoreRoutine);
         scoreRoutine = StartCoroutine(AnimateScorePopup());

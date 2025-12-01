@@ -426,8 +426,9 @@ public class GameManager : MonoBehaviour
         {
             EndGame(true);
         }
-
-        ui.ScorePopup(scoreToAdd);
+        // Only do the popup if it is not the last duck
+        else
+            ui.ScorePopup(scoreToAdd);
     }
     
     /// <summary>
@@ -542,6 +543,8 @@ public class GameManager : MonoBehaviour
         score += timeBonus;
         
         OnScoreChanged?.Invoke(score);
+
+        ui.ScorePopup(timeBonus, true);
     }
     
     /// <summary>
